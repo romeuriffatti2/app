@@ -1,0 +1,187 @@
+/* ========================= */
+/* FORM BASE */
+/* ========================= */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: center;
+    margin-top: 24px;
+    width: 100%;
+}
+
+/* ========================= */
+/* GRUPOS */
+/* ========================= */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    max-width: 420px;
+}
+
+/* ========================= */
+/* LABEL */
+/* ========================= */
+label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #444;
+}
+
+/* ========================= */
+/* INPUTS / SELECT */
+/* ========================= */
+select,
+input[type="text"] {
+    padding: 10px 12px;
+    border: 1px solid #dcdfe4;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #fff;
+    transition: all 0.2s ease;
+}
+
+/* foco bonito */
+select:focus,
+input:focus {
+    outline: none;
+    border-color: #1976d2;
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.15);
+}
+
+/* ========================= */
+/* ERROS */
+/* ========================= */
+.error {
+    color: #e53935;
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+/* ========================= */
+/* INPUT COM BOTÃO */
+/* ========================= */
+.input-with-button {
+    display: flex;
+    gap: 8px;
+}
+
+.input-with-button input {
+    flex: 1;
+}
+
+/* ========================= */
+/* LISTA DE NOMES */
+/* ========================= */
+.names-list-container {
+    width: 100%;
+    max-width: 420px;
+    margin-top: 10px;
+}
+
+.names-list-container h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* lista */
+.names-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* item */
+.names-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 10px 14px;
+    border-radius: 10px;
+
+    background: #f7f9fc;
+    border: 1px solid #e3e8ef;
+
+    transition: all 0.2s ease;
+}
+
+/* hover suave */
+.names-list li:hover {
+    background: #eef4ff;
+    border-color: #1976d2;
+}
+
+/* texto */
+.names-list span {
+    font-size: 14px;
+    color: #2c2c2c;
+}
+
+/* botão remover */
+.remove-button {
+    border: none;
+    background: #ffebee;
+    color: #e53935;
+
+    width: 30px;
+    height: 30px;
+
+    border-radius: 8px;
+    cursor: pointer;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: all 0.2s ease;
+}
+
+.remove-button:hover {
+    background: #ffcdd2;
+    transform: scale(1.05);
+}
+
+/* ========================= */
+/* LISTA VAZIA */
+/* ========================= */
+.empty-list {
+    font-size: 13px;
+    color: #777;
+    text-align: center;
+
+    padding: 14px;
+    border-radius: 8px;
+
+    background: #fafafa;
+    border: 1px dashed #ddd;
+}
+
+/* ========================= */
+/* AÇÕES (botões) */
+/* ========================= */
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+
+    width: 100%;
+    max-width: 420px;
+    margin-top: 10px;
+}
+
+/* botão único central (ex: próximo) */
+form>app-secondary-button {
+    margin-top: 10px;
+}

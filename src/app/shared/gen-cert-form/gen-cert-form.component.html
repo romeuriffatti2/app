@@ -1,0 +1,108 @@
+<form [formGroup]="certificadoForm" (ngSubmit)="onGenerateCerificationForm()">
+
+    @if (currentStep() === 1) {
+    <!-- ========================= -->
+    <!-- PASSO 1 -->
+    <!-- ========================= -->
+
+    <div class="form-group">
+        <label>Modalidade</label>
+        <select formControlName="generationType">
+            <option value="">Selecione</option>
+            <option value="planilha">Envio de Planilha</option>
+            <option value="manual">Manual</option>
+        </select>
+
+        @if (getErrorMessage('generationType')) {
+        <span class="error">
+            {{ getErrorMessage('generationType') }}
+        </span>
+        }
+    </div>
+
+    <div class="form-group">
+        <label>Tipo de Certificado</label>
+        <select formControlName="certificationType">
+            <option value="">Selecione</option>
+            <option value="parecerista">Parecerista</option>
+            <option value="corpo-editorial">Corpo editorial</option>
+            <option value="comite-tematico">Comitê temático</option>
+            <option value="aceite">Aceite</option>
+            <option value="publicacao">Publicação</option>
+        </select>
+
+        @if (getErrorMessage('certificationType')) {
+        <span class="error">
+            {{ getErrorMessage('certificationType') }}
+        </span>
+        }
+    </div>
+
+    <div class="form-group">
+        <label>Revista</label>
+        <select formControlName="magazine">
+            <option value="">Selecione</option>
+
+            @for (magazine of magazines(); track magazine.id) {
+            <option [value]="magazine.id">
+                {{ magazine.name }}
+            </option>
+            }
+        </select>
+
+        @if (getErrorMessage('magazine')) {
+        <span class="error">
+            {{ getErrorMessage('magazine') }}
+        </span>
+        }
+    </div>
+
+    <app-secondary-button text="Próximo" type="button" (click)="nextStep()">
+    </app-secondary-button>
+
+    } @else {
+
+    <!-- ========================= -->
+    <!-- PASSO 2 -->
+    <!-- ========================= -->
+
+    <div class="form-group">
+        <label>Nome da Pessoa</label>
+
+        <div class="input-with-button">
+            <input type="text" formControlName="manualName" placeholder="Digite o nome completo">
+            <app-secondary-button [text]="'Adicionar'" type="button" (click)="addManualName($event)"></app-secondary-button>        
+        </div>
+    </div>
+
+    <div class="names-list-container">
+        <h3>Nomes registrados:</h3>
+
+        @if (manualNames().length === 0) {
+        <p class="empty-list">Nenhum nome adicionado ainda.</p>
+        } @else {
+        <ul class="names-list">
+            @for (item of manualNames(); track item.validationCode) {
+            <li>
+                <span>{{ item.name }}</span>
+
+                <button type="button" class="remove-button" (click)="removeManualName(item.validationCode)">
+                    &times;
+                </button>
+            </li>
+            }
+        </ul>
+        }
+    </div>
+
+    <div class="form-actions">
+        <app-secondary-button text="Voltar" type="button" (click)="prevStep()">
+        </app-secondary-button>
+
+        <app-secondary-button text="Gerar Certificados" type="submit">
+        </app-secondary-button>
+    </div>
+
+    }
+
+</form>

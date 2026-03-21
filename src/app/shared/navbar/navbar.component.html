@@ -1,0 +1,18 @@
+<nav class="navbar">
+    <h1 class="logo" routerLink="/">CERT</h1>
+
+    <div class="nav-links" style="display: flex; gap: 20px; align-items: center;">
+        @if (isLoggedIn()) {
+            <a routerLink="/" style="color: #666; text-decoration: none;">Início</a>
+        }
+        <a routerLink="/validate_cert" style="color: #666; text-decoration: none;">Validar</a>
+    </div>
+
+    <div class="nav-actions">
+        @if (isLoggedIn()) {
+            <app-button [text]="'Logout'" (click)="onLogout()"></app-button>
+        } @else {
+            <app-button [text]="'Login'" (click)="onLogin()"></app-button>
+        }
+    </div>
+</nav>

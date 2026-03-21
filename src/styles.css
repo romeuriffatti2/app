@@ -1,1 +1,27 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import 'ngx-toastr/toastr';
+* {
+    box-sizing: border-box;
+    margin: 0px;
+    padding: 0px;
+    font-family: var(--primary-font), Helvetica, sans-serif;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    font-family: var(--primary-font), Helvetica, sans-serif;
+    background-color: var(--black);
+}
+
+:root {
+    --primary-font: "Inter";
+    --purple-100: #a274a7;
+    --purple-200: #6d566e;
+    --blue-200: #4e66db;
+    --blue-300: #6076DF;
+    --gray-200: #D9D9D9;
+    --black: #1E1E1E;
+    --purple: #591AB2;
+    --gray: #2E2938;
+}

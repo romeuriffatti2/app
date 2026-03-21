@@ -1,0 +1,22 @@
+<app-navbar></app-navbar>
+
+<main class="page-container">
+
+    <div class="actions-bar">
+        <app-secondary-button [text]="'Gerar Certificado'" (click)="onOpenForm()">
+        </app-secondary-button>
+        <app-secondary-button [text]="'Cadastrar Revista'" (click)="onOpenRegistryMagazine()">
+        </app-secondary-button>
+    </div>
+
+    <div class="forms-container">
+
+        @if (isCertFormOpen()) {
+        <div class="form-card"><app-gen-cert-form></app-gen-cert-form></div>
+        }
+        @if (isMagazineFormOpen()) {
+        <div class="form-card"><app-reg-mag-form></app-reg-mag-form></div>
+        }
+    </div>
+
+</main>
