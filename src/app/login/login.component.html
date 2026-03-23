@@ -1,0 +1,40 @@
+<div class="login-container">
+  <div class="login-card">
+    <h2>Login</h2>
+    <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input 
+          type="email" 
+          id="email" 
+          formControlName="email" 
+          name="email"
+          [class.invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+        @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+          <small class="error-text">
+            @if (loginForm.get('email')?.errors?.['required']) { O e-mail é obrigatório. }
+            @if (loginForm.get('email')?.errors?.['email']) { Digite um e-mail válido. }
+          </small>
+        }
+      </div>
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input 
+          type="password" 
+          id="password" 
+          formControlName="password" 
+          name="password"
+          [class.invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+        @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+          <small class="error-text">A senha é obrigatória.</small>
+        }
+      </div>
+      <button type="submit" class="submit-btn" [disabled]="loginForm.invalid || loading">
+        {{ loading ? 'Entrando...' : 'Entrar' }}
+      </button>
+      @if (error) {
+        <p class="error-msg">{{ error }}</p>
+      }
+    </form>
+  </div>
+</div>

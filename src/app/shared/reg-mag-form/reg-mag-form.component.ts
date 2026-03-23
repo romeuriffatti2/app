@@ -24,7 +24,9 @@ export class RegMagFormComponent {
     name: new FormControl('', [Validators.required,Validators.minLength(3)]),
     issn: new FormControl('', [Validators.required,Validators.pattern(/^\d{4}-\d{3}[\dX]$/)]),
     isbn: new FormControl('', [Validators.required, Validators.pattern(/^\d{4}-\d{3}[\dX]$/)]),
-    email: new FormControl('', [Validators.required,Validators.email]),})
+    email: new FormControl('', [Validators.required,Validators.email]),
+    cnpj: new FormControl('', [Validators.required])
+  })
 
   protected handleMagazineFormSubmit() {
     if (this.magazineForm.invalid) {

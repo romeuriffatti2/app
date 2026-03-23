@@ -15,24 +15,24 @@ export class AuthService {
   login(credentials: { email: string; password: any }) {
     return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
       tap(response => {
-        localStorage.setItem('token', response.token);
+        sessionStorage.setItem('token', response.token);
         this.isAuthenticatedSignal.set(true);
       })
     );
   }
 
   logout() {
-    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
     this.isAuthenticatedSignal.set(false);
     this.router.navigate(['/login']);
   }
 
   getToken() {
-    return localStorage.getItem('token');
+    return sessionStorage.getItem('token');
   }
 
   hasToken(): boolean {
-    return !!localStorage.getItem('token');
+    return !!sessionStorage.getItem('token');
   }
 
   isAuthenticated() {

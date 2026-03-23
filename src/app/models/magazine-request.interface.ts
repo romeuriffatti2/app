@@ -3,4 +3,5 @@ export interface MagazineRequest {
     isbn: string,
     issn: string,
     email: string,
+    cnpj: string,
 }

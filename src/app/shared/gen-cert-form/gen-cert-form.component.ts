@@ -5,8 +5,10 @@ import { SecondaryButtonComponent } from "../secondary-button/secondary-button.c
 import { MagazineService } from '../../services/magazine-service.service';
 import { CertificateService } from '../../services/certificate.service';
 import { MagazineResponse } from '../../models/magazine-response.interface';
+import { IssuerResponse } from '../../models/issuer.interface';
 import { ToastrService } from 'ngx-toastr';
 import { CertificateItemRequest, CertificateRequest } from '../../models/certificate-request.interface';
+import { IssuerService } from '../../services/issuer.service';
 
 @Component({
   selector: 'app-gen-cert-form',
@@ -19,9 +21,11 @@ export class GenCertFormComponent {
 
   private toastr = inject(ToastrService);
   private magazineService = inject(MagazineService);
+  private issuerService = inject(IssuerService);
   private certificateService = inject(CertificateService);
 
   protected magazines = signal<MagazineResponse[]>([]);
+
   protected currentStep = signal<number>(1);
   protected manualNames = signal<CertificateItemRequest[]>([]);
 
@@ -29,7 +33,20 @@ export class GenCertFormComponent {
     generationType: new FormControl('manual', Validators.required),
     certificationType: new FormControl('', Validators.required),
     magazine: new FormControl('', Validators.required),
-    manualName: new FormControl('')
+    volume: new FormControl(''),
+    number: new FormControl(''),
+    manualName: new FormControl(''),
+    
+    // Metadados dinâmicos
+    evaluationId: new FormControl(''),
+    cpf: new FormControl(''),
+    startDate: new FormControl(''),
+    endDate: new FormControl(''),
+    dossieTitle: new FormControl(''),
+    articleTitle: new FormControl(''),
+    publishMonthYear: new FormControl(''),
+    doi: new FormControl(''),
+    accessLink: new FormControl('')
   });
 
   private errorMessages: Record<string, any> = {
@@ -41,6 +58,7 @@ export class GenCertFormComponent {
   ngOnInit() {
     this.getMagazines();
   }
+
 
   private getMagazines(): void {
     this.magazineService.getAllMagazines().subscribe({
@@ -100,7 +118,18 @@ export class GenCertFormComponent {
 
     const newItem: CertificateItemRequest = {
       name,
-      validationCode: crypto.randomUUID()
+      validationCode: crypto.randomUUID(),
+      metadata: {
+        evaluationId: this.certificadoForm.get('evaluationId')?.value || null,
+        cpf: this.certificadoForm.get('cpf')?.value || null,
+        startDate: this.certificadoForm.get('startDate')?.value || null,
+        endDate: this.certificadoForm.get('endDate')?.value || null,
+        dossieTitle: this.certificadoForm.get('dossieTitle')?.value || null,
+        articleTitle: this.certificadoForm.get('articleTitle')?.value || null,
+        publishMonthYear: this.certificadoForm.get('publishMonthYear')?.value || null,
+        doi: this.certificadoForm.get('doi')?.value || null,
+        accessLink: this.certificadoForm.get('accessLink')?.value || null
+      }
     };
 
     this.manualNames.update(list => [...list, newItem]);
@@ -123,6 +152,9 @@ export class GenCertFormComponent {
 
     const request: CertificateRequest = {
       magazineId: Number(this.certificadoForm.get('magazine')?.value),
+      type: this.certificadoForm.get('certificationType')?.value || '',
+      volume: this.certificadoForm.get('volume')?.value || '',
+      number: this.certificadoForm.get('number')?.value || '',
       certificates: this.manualNames()
     };
 

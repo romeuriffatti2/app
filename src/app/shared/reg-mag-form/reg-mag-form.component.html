@@ -32,6 +32,14 @@
         <span class="error">Email inválido</span>
         }
     </div>
+
+    <div class="form-group">
+        <label>CNPJ</label>
+        <input formControlName="cnpj" placeholder="00.000.000/0000-00">
+        @if(magazineForm.get('cnpj')?.touched && magazineForm.get('cnpj')?.invalid){
+        <span class="error">CNPJ obrigatório</span>
+        }
+    </div>
     <app-secondary-button [text]="'Cadastrar'" (type)="'submit'"></app-secondary-button>
 
 </form>

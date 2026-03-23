@@ -57,6 +57,69 @@
         }
     </div>
 
+    <div class="form-group row-group">
+        <label>Volume</label>
+        <input type="text" formControlName="volume" placeholder="Ex: Vol. 1">
+        
+        <label>Número</label>
+        <input type="text" formControlName="number" placeholder="Ex: N. 2">
+    </div>
+
+    <!-- METADADOS DINÂMICOS CONFORME certificationType -->
+    @if (certificadoForm.get('certificationType')?.value === 'parecerista') {
+    <div class="form-group">
+        <label>ID da Avaliação</label>
+        <input type="text" formControlName="evaluationId" placeholder="Ex: 54321">
+    </div>
+    }
+
+    @if (certificadoForm.get('certificationType')?.value === 'corpo-editorial' || certificadoForm.get('certificationType')?.value === 'comite-tematico') {
+    <div class="form-group">
+        <label>CPF</label>
+        <input type="text" formControlName="cpf" placeholder="Ex: 000.000.000-00">
+    </div>
+    <div class="form-group row-group">
+        <label>Data de Início</label>
+        <input type="text" formControlName="startDate" placeholder="Ex: 01/01/2023">
+        <label>Data de Término</label>
+        <input type="text" formControlName="endDate" placeholder="Ex: até a presente data">
+    </div>
+    }
+
+    @if (certificadoForm.get('certificationType')?.value === 'dossie') {
+    <div class="form-group">
+        <label>CPF</label>
+        <input type="text" formControlName="cpf" placeholder="Ex: 000.000.000-00">
+    </div>
+    <div class="form-group">
+        <label>Título do Dossiê</label>
+        <input type="text" formControlName="dossieTitle" placeholder="Ex: Temas em Educação">
+    </div>
+    }
+
+    @if (certificadoForm.get('certificationType')?.value === 'aceite' || certificadoForm.get('certificationType')?.value === 'publicacao') {
+    <div class="form-group">
+        <label>Título do Artigo</label>
+        <input type="text" formControlName="articleTitle" placeholder="Ex: O impacto socioeconômico...">
+    </div>
+    }
+
+    @if (certificadoForm.get('certificationType')?.value === 'aceite') {
+    <div class="form-group">
+        <label>Mês e Ano de Publicação</label>
+        <input type="text" formControlName="publishMonthYear" placeholder="Ex: Dezembro/2025">
+    </div>
+    }
+
+    @if (certificadoForm.get('certificationType')?.value === 'publicacao') {
+    <div class="form-group row-group">
+        <label>DOI</label>
+        <input type="text" formControlName="doi" placeholder="Ex: 10.1234/test">
+        <label>Link de Acesso</label>
+        <input type="text" formControlName="accessLink" placeholder="Ex: https://...">
+    </div>
+    }
+
     <app-secondary-button text="Próximo" type="button" (click)="nextStep()">
     </app-secondary-button>
 
