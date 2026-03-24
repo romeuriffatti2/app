@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { API_BASE_URL } from '../api/api';
 
 @Component({
   selector: 'app-validate-cert',
@@ -406,7 +407,7 @@ import { CommonModule } from '@angular/common';
 })
 export class ValidateCertComponent {
   private http = inject(HttpClient);
-  
+
   validationCode = '';
   loading = false;
   error = '';
@@ -414,12 +415,12 @@ export class ValidateCertComponent {
 
   onValidate() {
     if (!this.validationCode || this.validationCode.trim() === '') return;
-    
+
     this.loading = true;
     this.error = '';
     this.certificate.set(null);
 
-    this.http.get<any>(`http://localhost:8080/api/certificate/validate/${this.validationCode}`).subscribe({
+    this.http.get<any>(`${API_BASE_URL}/certificate/validate/${this.validationCode}`).subscribe({
       next: (data) => {
         this.certificate.set(data);
         this.loading = false;
@@ -432,6 +433,6 @@ export class ValidateCertComponent {
   }
 
   onDownload(uuid: string) {
-    window.open(`http://localhost:8080/api/certificate/download/${uuid}`, '_blank');
+    window.open(`${API_BASE_URL}/certificate/download/${uuid}`, '_blank');
   }
 }

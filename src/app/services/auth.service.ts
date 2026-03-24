@@ -2,18 +2,18 @@ import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { API_BASE_URL } from '../api/api';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/api/auth';
   private isAuthenticatedSignal = signal<boolean>(this.hasToken());
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient, private router: Router) { }
 
   login(credentials: { email: string; password: any }) {
-    return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
+    return this.http.post<any>(`${API_BASE_URL}/auth/login`, credentials).pipe(
       tap(response => {
         sessionStorage.setItem('token', response.token);
         this.isAuthenticatedSignal.set(true);
