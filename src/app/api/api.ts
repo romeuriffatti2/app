@@ -1,1 +1,1 @@
-export const API_BASE_URL = "https://api-e4lp.onrender.com/api";
+export const API_BASE_URL = (import.meta as any).env.NG_APP_API_BASE_URL || "http://localhost:8080/api";
