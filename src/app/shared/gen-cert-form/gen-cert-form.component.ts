@@ -36,8 +36,6 @@ export class GenCertFormComponent {
     volume: new FormControl(''),
     number: new FormControl(''),
     manualName: new FormControl(''),
-    
-    // Metadados dinâmicos
     evaluationId: new FormControl(''),
     cpf: new FormControl(''),
     startDate: new FormControl(''),

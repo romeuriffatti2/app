@@ -1,0 +1,83 @@
+<div class="editor-wrapper">
+
+  <!-- Top toolbar -->
+  <div class="editor-toolbar">
+    <div class="toolbar-left">
+      <button class="btn-back" (click)="goBack()" title="Voltar para meus templates">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        Voltar
+      </button>
+      <div class="editor-title-block">
+        <span class="editor-label">Editando</span>
+        <h2 class="editor-name">{{ templateName() }}</h2>
+      </div>
+    </div>
+
+    <div class="toolbar-right">
+      <!-- Upload Background -->
+      <label class="btn-upload" title="Escolher imagem de fundo (PNG/JPG)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
+          <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+        </svg>
+        Imagem de Fundo
+        <input type="file" accept="image/png,image/jpeg" (change)="uploadBackground($event)" hidden />
+      </label>
+
+      <!-- Save -->
+      <button class="btn-save" (click)="save()" [disabled]="saving()">
+        @if (saving()) {
+          <div class="btn-spinner"></div>
+          Salvando...
+        } @else if (saveSuccess()) {
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Salvo!
+        } @else {
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+          </svg>
+          Salvar Template
+        }
+      </button>
+    </div>
+  </div>
+
+  <!-- Help tip -->
+  <div class="help-tip">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    Use variáveis nos campos de texto:
+    <code>{{'{{name}}'}}</code>&nbsp;
+    <code>{{'{{magazineName}}'}}</code>&nbsp;
+    <code>{{'{{issn}}'}}</code>&nbsp;
+    <code>{{'{{date}}'}}</code>&nbsp;
+    <code>{{'{{validationCode}}'}}</code>
+  </div>
+
+  <!-- Loading state -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner-large"></div>
+      <p>Carregando editor PDFME...</p>
+    </div>
+  }
+
+  <!-- Error state -->
+  @if (!loading() && error()) {
+    <div class="error-state">
+      <p>{{ error() }}</p>
+      <button class="btn-back" (click)="goBack()">Voltar</button>
+    </div>
+  }
+
+  <!-- PDFME Designer container -->
+  @if (!loading() && !error()) {
+    <div class="designer-host" #designerContainer></div>
+  }
+</div>

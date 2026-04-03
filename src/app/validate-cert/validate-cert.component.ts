@@ -12,16 +12,14 @@ import { API_BASE_URL } from '../api/api';
   styleUrl: './validate-cert.component.css'
 })
 export class ValidateCertComponent {
+
   private http = inject(HttpClient);
   protected loading = signal<boolean>(false);
   protected error = signal<string>('');
   protected certificate = signal<any>(null);
 
   validationForm = new FormGroup({
-    validationCode: new FormControl('', {
-      nonNullable: true,
-      validators: [Validators.required]
-    })
+    validationCode: new FormControl('', { nonNullable: true, validators: [Validators.required] })
   });
 
   onValidate() {
