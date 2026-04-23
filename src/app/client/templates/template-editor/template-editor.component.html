@@ -77,7 +77,5 @@
   }
 
   <!-- PDFME Designer container -->
-  @if (!loading() && !error()) {
-    <div class="designer-host" #designerContainer></div>
-  }
+  <div class="designer-host" #designerContainer [hidden]="loading() || error()"></div>
 </div>

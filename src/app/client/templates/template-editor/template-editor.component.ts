@@ -45,39 +45,49 @@ export class TemplateEditorComponent implements AfterViewInit, OnDestroy {
   private loadAndInit() {
     this.loading.set(true);
     this.error.set(null);
-
     this.templateService.getById(this.templateId).subscribe({
       next: (template) => {
         this.templateName.set(template.name);
-
+        const blankPdf = { width: 297, height: 210 };
         let schema: any;
         try {
           schema = JSON.parse(template.jsonSchema);
         } catch {
-          schema = { basePdf: '__BLANK_PDF__', schemas: [[]] };
+          schema = { basePdf: blankPdf, schemas: [[]] };
         }
 
-        // Garante estrutura mínima válida para o PDFME
-        if (!schema.basePdf) schema.basePdf = '__BLANK_PDF__';
+        if (!schema.basePdf) schema.basePdf = blankPdf;
         if (!schema.schemas || !Array.isArray(schema.schemas)) schema.schemas = [[]];
-
-        this.designer = new Designer({
-          domContainer: this.container.nativeElement,
-          template: schema,
-          options: {
-            font: getDefaultFont(),
-            lang: 'en',
-            labels: {
-              'Download JSON': 'Baixar JSON',
-              clear: 'Limpar',
-              cancel: 'Cancelar',
-              fieldName: 'Nome do Campo',
-              'Select Font': 'Fonte',
-            }
-          }
-        });
-
+        
+        // If basePdf is a string, it's either an old/broken base64 or a corrupted JSON string
+        // In all cases, if it's a string, we migrate it to our new stable object format
+        if (typeof schema.basePdf === 'string') {
+          console.log('Migrating string-based basePdf to object format');
+          schema.basePdf = blankPdf;
+        }
         this.loading.set(false);
+        setTimeout(() => {
+          try {
+            this.designer = new Designer({
+              domContainer: this.container.nativeElement,
+              template: schema,
+              options: {
+                font: getDefaultFont(),
+                lang: 'en',
+                labels: {
+                  'Download JSON': 'Baixar JSON',
+                  clear: 'Limpar',
+                  cancel: 'Cancelar',
+                  fieldName: 'Nome do Campo',
+                  'Select Font': 'Fonte',
+                }
+              }
+            });
+          } catch (e) {
+            console.error('Erro ao inicializar PDFME:', e);
+            this.error.set('Erro ao carregar o editor gráfico.');
+          }
+        }, 50);
       },
       error: (err) => {
         this.error.set('Não foi possível carregar o template.');
@@ -91,9 +101,7 @@ export class TemplateEditorComponent implements AfterViewInit, OnDestroy {
     if (!this.designer) return;
     this.saving.set(true);
     this.saveSuccess.set(false);
-
     const jsonSchema = JSON.stringify(this.designer.getTemplate());
-
     this.templateService.save(this.templateId, {
       name: this.templateName(),
       jsonSchema
