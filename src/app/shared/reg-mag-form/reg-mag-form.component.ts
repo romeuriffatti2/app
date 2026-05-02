@@ -19,13 +19,11 @@ export class RegMagFormComponent {
   private toastr = inject(ToastrService)
   protected magazines = signal<MagazineResponse[]>([])
 
-
   protected magazineForm = new FormGroup({
-    name: new FormControl('', [Validators.required,Validators.minLength(3)]),
-    issn: new FormControl('', [Validators.required,Validators.pattern(/^\d{4}-\d{3}[\dX]$/)]),
-    isbn: new FormControl('', [Validators.required, Validators.pattern(/^\d{4}-\d{3}[\dX]$/)]),
-    email: new FormControl('', [Validators.required,Validators.email]),
-    cnpj: new FormControl('', [Validators.required])
+    name: new FormControl('', [Validators.required, Validators.minLength(3)]),
+    issn: new FormControl('', [Validators.required, Validators.pattern(/^\d{4}-\d{3}[\dX]$/)]),
+    email: new FormControl('', [Validators.required, Validators.email]),
+    cnpj: new FormControl('')
   })
 
   protected handleMagazineFormSubmit() {
@@ -39,7 +37,7 @@ export class RegMagFormComponent {
     this.magazineService.postMagazine(magazine).subscribe({
       next: (res) => {
         this.toastr.success("Revista cadastrada com sucesso");
-        this.toastr.success(`${res.name}, ${res.issn}, ${res.isbn}, ${res.email}`);
+        this.toastr.info(`${res.name} — ISSN: ${res.issn}`);
         this.magazineForm.reset();
       },
       error: () => {

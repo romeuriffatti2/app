@@ -1,45 +1,34 @@
 <form [formGroup]="magazineForm" (ngSubmit)="handleMagazineFormSubmit()">
 
     <div class="form-group">
-        <label>Nome da Revista</label>
-        <input formControlName="name">
-
+        <label for="name">Nome da Revista</label>
+        <input id="name" formControlName="name" placeholder="Ex: Revista de Estudos Interdisciplinares">
         @if(magazineForm.get('name')?.touched && magazineForm.get('name')?.invalid){
         <span class="error">Nome obrigatório (mín. 3 caracteres)</span>
         }
     </div>
 
     <div class="form-group">
-        <label>ISSN</label>
-        <input formControlName="issn" placeholder="0000-0000">
+        <label for="issn">ISSN</label>
+        <input id="issn" formControlName="issn" placeholder="0000-0000">
         @if(magazineForm.get('issn')?.touched && magazineForm.get('issn')?.invalid){
         <span class="error">ISSN inválido (ex: 1234-567X)</span>
         }
     </div>
 
     <div class="form-group">
-        <label>ISBN</label>
-        <input formControlName="isbn">
-        @if(magazineForm.get('isbn')?.touched && magazineForm.get('isbn')?.invalid){
-        <span class="error">ISBN obrigatório</span>
-        }
-    </div>
-
-    <div class="form-group">
-        <label>Email</label>
-        <input formControlName="email">
+        <label for="email">Email</label>
+        <input id="email" formControlName="email" placeholder="contato@revista.com">
         @if(magazineForm.get('email')?.touched && magazineForm.get('email')?.invalid){
         <span class="error">Email inválido</span>
         }
     </div>
 
     <div class="form-group">
-        <label>CNPJ</label>
-        <input formControlName="cnpj" placeholder="00.000.000/0000-00">
-        @if(magazineForm.get('cnpj')?.touched && magazineForm.get('cnpj')?.invalid){
-        <span class="error">CNPJ obrigatório</span>
-        }
+        <label for="cnpj">CNPJ <span class="optional">(opcional)</span></label>
+        <input id="cnpj" formControlName="cnpj" placeholder="00.000.000/0000-00">
     </div>
-    <app-secondary-button [text]="'Cadastrar'" (type)="'submit'"></app-secondary-button>
+
+    <app-secondary-button [text]="'Cadastrar'" (click)="handleMagazineFormSubmit()"></app-secondary-button>
 
 </form>
