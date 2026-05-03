@@ -1,0 +1,21 @@
+@if (isLoading()) {
+  <div class="person-list__loading">
+    <span class="person-list__spinner"></span>
+    <p>Carregando pessoas...</p>
+  </div>
+} @else if (persons().length === 0) {
+  <div class="person-list__empty">
+    <span class="person-list__empty-icon">📭</span>
+    <p>Nenhuma pessoa cadastrada ainda.</p>
+  </div>
+} @else {
+  <div class="person-list__header">
+    <span class="person-list__count">{{ persons().length }} pessoa{{ persons().length !== 1 ? 's' : '' }} encontrada{{ persons().length !== 1 ? 's' : '' }}</span>
+  </div>
+
+  <div class="person-list__items">
+    @for (person of persons(); track person.id) {
+      <app-person-list-item [person]="person" />
+    }
+  </div>
+}

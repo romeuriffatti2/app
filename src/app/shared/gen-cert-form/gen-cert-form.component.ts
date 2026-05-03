@@ -1,33 +1,49 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { SecondaryButtonComponent } from "../secondary-button/secondary-button.component";
 import { MagazineService } from '../../services/magazine-service.service';
 import { CertificateService } from '../../services/certificate.service';
 import { MagazineResponse } from '../../models/magazine-response.interface';
-import { IssuerResponse } from '../../models/issuer.interface';
 import { ToastrService } from 'ngx-toastr';
 import { CertificateItemRequest, CertificateRequest } from '../../models/certificate-request.interface';
-import { IssuerService } from '../../services/issuer.service';
+import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
+import { PersonService } from '../../services/person.service';
+import { PersonResponse } from '../../models/person.interface';
 
 @Component({
   selector: 'app-gen-cert-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, SecondaryButtonComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, SecondaryButtonComponent, NgxMaskDirective],
+  providers: [provideNgxMask()],
   templateUrl: './gen-cert-form.component.html',
   styleUrl: './gen-cert-form.component.css',
 })
-export class GenCertFormComponent {
+export class GenCertFormComponent implements OnInit {
 
   private toastr = inject(ToastrService);
   private magazineService = inject(MagazineService);
-  private issuerService = inject(IssuerService);
   private certificateService = inject(CertificateService);
+  private personService = inject(PersonService);
 
   protected magazines = signal<MagazineResponse[]>([]);
+  protected allPersons = signal<PersonResponse[]>([]);
 
   protected currentStep = signal<number>(1);
   protected manualNames = signal<CertificateItemRequest[]>([]);
+  protected options1To100 = Array.from({ length: 100 }, (_, i) => i + 1);
+
+  // Recipient selection state
+  protected recipientMode = signal<'manual' | 'search'>('manual');
+  protected searchQuery = signal<string>('');
+
+  protected filteredPersons = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    if (!query) return [];
+    return this.allPersons().filter(p => 
+      p.name.toLowerCase().includes(query) || p.cpf.includes(query)
+    );
+  });
 
   protected certificadoForm = new FormGroup({
     generationType: new FormControl('manual', Validators.required),
@@ -36,6 +52,7 @@ export class GenCertFormComponent {
     volume: new FormControl(''),
     number: new FormControl(''),
     manualName: new FormControl(''),
+    manualCpf: new FormControl(''),
     evaluationId: new FormControl(''),
     cpf: new FormControl(''),
     startDate: new FormControl(''),
@@ -55,8 +72,8 @@ export class GenCertFormComponent {
 
   ngOnInit() {
     this.getMagazines();
+    this.getPersons();
   }
-
 
   private getMagazines(): void {
     this.magazineService.getAllMagazines().subscribe({
@@ -65,29 +82,30 @@ export class GenCertFormComponent {
     });
   }
 
+  private getPersons(): void {
+    this.personService.getAllPersons().subscribe({
+      next: (res) => this.allPersons.set(res),
+      error: () => this.toastr.error("Não foi possível carregar as pessoas"),
+    });
+  }
+
   protected getErrorMessage(field: string): string | null {
     const control = this.certificadoForm.get(field);
-
     if (!control || !control.touched) return null;
-
     const errors = control.errors;
     if (!errors) return null;
-
     const fieldErrors = this.errorMessages[field];
-
     for (const errorKey in errors) {
       if (fieldErrors?.[errorKey]) {
         return fieldErrors[errorKey];
       }
     }
-
     return null;
   }
 
   protected nextStep(): void {
     const fields = ['generationType', 'certificationType', 'magazine'];
     let isValid = true;
-
     fields.forEach(field => {
       const control = this.certificadoForm.get(field);
       if (control?.invalid) {
@@ -106,20 +124,42 @@ export class GenCertFormComponent {
   }
 
   protected addManualName(event?: Event): void {
-    event?.preventDefault(); // 🔥 evita qualquer comportamento do form
+    event?.preventDefault(); 
     event?.stopPropagation();
 
-    const control = this.certificadoForm.get('manualName');
-    const name = control?.value?.trim();
+    const nameControl = this.certificadoForm.get('manualName');
+    const cpfControl = this.certificadoForm.get('manualCpf');
+    const name = nameControl?.value?.trim();
+    const cpf = cpfControl?.value?.trim();
 
-    if (!name) return;
+    if (!name) {
+      this.toastr.warning("Nome é obrigatório.");
+      return;
+    }
+
+    this.addPersonToList(name, cpf);
+
+    nameControl?.setValue('');
+    cpfControl?.setValue('');
+  }
+
+  protected addPersonFromSearch(person: PersonResponse): void {
+    this.addPersonToList(person.name, person.cpf);
+    this.searchQuery.set('');
+  }
+
+  private addPersonToList(name: string, cpf?: string | null): void {
+    if (this.manualNames().some(n => n.name === name && n.metadata?.cpf === cpf)) {
+      this.toastr.warning("Esta pessoa já foi adicionada.");
+      return;
+    }
 
     const newItem: CertificateItemRequest = {
       name,
       validationCode: crypto.randomUUID(),
       metadata: {
         evaluationId: this.certificadoForm.get('evaluationId')?.value || null,
-        cpf: this.certificadoForm.get('cpf')?.value || null,
+        cpf: cpf || this.certificadoForm.get('cpf')?.value || null,
         startDate: this.certificadoForm.get('startDate')?.value || null,
         endDate: this.certificadoForm.get('endDate')?.value || null,
         dossieTitle: this.certificadoForm.get('dossieTitle')?.value || null,
@@ -131,7 +171,6 @@ export class GenCertFormComponent {
     };
 
     this.manualNames.update(list => [...list, newItem]);
-    control?.setValue('');
   }
 
   protected removeManualName(code: string): void {
@@ -139,13 +178,11 @@ export class GenCertFormComponent {
   }
 
   protected onGenerateCerificationForm(): void {
-
-    // 🔒 proteção contra submit fora da etapa 2
     if (this.currentStep() !== 2) return;
 
     if (this.manualNames().length === 0) {
       this.toastr.warning("Adicione pelo menos um nome.");
-      return
+      return;
     }
 
     const request: CertificateRequest = {

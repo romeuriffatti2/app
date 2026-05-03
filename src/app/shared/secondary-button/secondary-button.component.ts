@@ -8,6 +8,6 @@ import { Component, input } from '@angular/core';
   styleUrl: './secondary-button.component.css',
 })
 export class SecondaryButtonComponent {
-  public text = input<string>('')
-
+  public text = input<string>('');
+  public type = input<'button' | 'submit' | 'reset'>('button');
 }

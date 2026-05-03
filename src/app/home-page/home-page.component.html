@@ -1,22 +1,116 @@
 <app-navbar></app-navbar>
 
-<main class="page-container">
+<div class="app-layout">
 
-    <div class="actions-bar">
-        <app-secondary-button [text]="'Gerar Certificado'" (click)="onOpenForm()">
-        </app-secondary-button>
-        <app-secondary-button [text]="'Cadastrar Revista'" (click)="onOpenRegistryMagazine()">
-        </app-secondary-button>
-    </div>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <nav class="sidebar-nav">
+            <button
+                class="sidebar-item"
+                [class.active]="isCertFormOpen()"
+                (click)="onOpenForm()">
+                <span class="sidebar-icon">📄</span>
+                Gerar Certificado
+            </button>
 
-    <div class="forms-container">
+            <!-- Dropdown Revista -->
+            <div class="sidebar-dropdown" [class.open]="isMagazineDropdownOpen()">
+                <button
+                    class="sidebar-item sidebar-item--dropdown"
+                    [class.active]="isMagazineActive()"
+                    (click)="onToggleMagazineDropdown()">
+                    <span class="sidebar-icon">📰</span>
+                    Revista
+                    <span class="dropdown-arrow">{{ isMagazineDropdownOpen() ? '▲' : '▼' }}</span>
+                </button>
 
+                <div class="sidebar-submenu">
+                    <button
+                        class="sidebar-subitem"
+                        [class.active]="isMagazineFormOpen()"
+                        (click)="onOpenRegistryMagazine()">
+                        <span class="sidebar-icon">➕</span>
+                        Cadastrar Revista
+                    </button>
+                    <button
+                        class="sidebar-subitem"
+                        [class.active]="isMagazineListOpen()"
+                        (click)="onOpenMagazineList()">
+                        <span class="sidebar-icon">📋</span>
+                        Listar Revistas
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dropdown Pessoas -->
+            <div class="sidebar-dropdown" [class.open]="isPersonDropdownOpen()">
+                <button
+                    class="sidebar-item sidebar-item--dropdown"
+                    [class.active]="isPersonActive()"
+                    (click)="onTogglePersonDropdown()">
+                    <span class="sidebar-icon">👤</span>
+                    Pessoas
+                    <span class="dropdown-arrow">{{ isPersonDropdownOpen() ? '▲' : '▼' }}</span>
+                </button>
+
+                <div class="sidebar-submenu">
+                    <button
+                        class="sidebar-subitem"
+                        [class.active]="isPersonFormOpen()"
+                        (click)="onOpenPersonForm()">
+                        <span class="sidebar-icon">➕</span>
+                        Cadastrar Pessoa
+                    </button>
+                    <button
+                        class="sidebar-subitem"
+                        [class.active]="isPersonListOpen()"
+                        (click)="onOpenPersonList()">
+                        <span class="sidebar-icon">📋</span>
+                        Listar Pessoas
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-content">
         @if (isCertFormOpen()) {
-        <div class="form-card"><app-gen-cert-form></app-gen-cert-form></div>
+            <div class="form-card">
+                <h2 class="form-title">Gerar Certificado</h2>
+                <app-gen-cert-form></app-gen-cert-form>
+            </div>
         }
         @if (isMagazineFormOpen()) {
-        <div class="form-card"><app-reg-mag-form></app-reg-mag-form></div>
+            <div class="form-card">
+                <h2 class="form-title">Cadastrar Revista</h2>
+                <app-reg-mag-form></app-reg-mag-form>
+            </div>
         }
-    </div>
+        @if (isMagazineListOpen()) {
+            <div class="form-card form-card--wide">
+                <h2 class="form-title">Revistas Cadastradas</h2>
+                <app-mag-list></app-mag-list>
+            </div>
+        }
+        @if (isPersonFormOpen()) {
+            <div class="form-card">
+                <h2 class="form-title">Cadastrar Pessoa</h2>
+                <app-reg-person-form></app-reg-person-form>
+            </div>
+        }
+        @if (isPersonListOpen()) {
+            <div class="form-card form-card--wide">
+                <h2 class="form-title">Pessoas Cadastradas</h2>
+                <app-person-list></app-person-list>
+            </div>
+        }
+        @if (!isCertFormOpen() && !isMagazineFormOpen() && !isMagazineListOpen() && !isPersonFormOpen() && !isPersonListOpen()) {
+            <div class="empty-state">
+                <span class="empty-icon">🏠</span>
+                <p>Selecione uma opção no menu lateral para começar.</p>
+            </div>
+        }
+    </main>
 
-</main>
+</div>

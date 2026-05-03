@@ -1,0 +1,21 @@
+@if (isLoading()) {
+  <div class="mag-list__loading">
+    <span class="mag-list__spinner"></span>
+    <p>Carregando revistas...</p>
+  </div>
+} @else if (magazines().length === 0) {
+  <div class="mag-list__empty">
+    <span class="mag-list__empty-icon">📭</span>
+    <p>Nenhuma revista cadastrada ainda.</p>
+  </div>
+} @else {
+  <div class="mag-list__header">
+    <span class="mag-list__count">{{ magazines().length }} revista{{ magazines().length !== 1 ? 's' : '' }} encontrada{{ magazines().length !== 1 ? 's' : '' }}</span>
+  </div>
+
+  <div class="mag-list__items">
+    @for (magazine of magazines(); track magazine.id) {
+      <app-mag-list-item [magazine]="magazine" />
+    }
+  </div>
+}

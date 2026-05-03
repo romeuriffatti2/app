@@ -9,6 +9,14 @@
     </div>
 
     <div class="form-group">
+        <label for="responsavelTecnico">Responsável Técnico</label>
+        <input id="responsavelTecnico" formControlName="responsavelTecnico" placeholder="Nome completo do responsável técnico">
+        @if(magazineForm.get('responsavelTecnico')?.touched && magazineForm.get('responsavelTecnico')?.invalid){
+        <span class="error">Responsável técnico obrigatório (mín. 3 caracteres)</span>
+        }
+    </div>
+
+    <div class="form-group">
         <label for="issn">ISSN</label>
         <input id="issn" formControlName="issn" placeholder="0000-0000">
         @if(magazineForm.get('issn')?.touched && magazineForm.get('issn')?.invalid){
@@ -29,6 +37,6 @@
         <input id="cnpj" formControlName="cnpj" placeholder="00.000.000/0000-00">
     </div>
 
-    <app-secondary-button [text]="'Cadastrar'" (click)="handleMagazineFormSubmit()"></app-secondary-button>
+    <app-secondary-button [text]="'Cadastrar'" [type]="'submit'"></app-secondary-button>
 
 </form>

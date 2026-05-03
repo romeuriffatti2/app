@@ -1,0 +1,26 @@
+<div class="mag-item">
+  <div class="mag-item__col mag-item__col--name">
+    <span class="mag-item__label">Revista</span>
+    <span class="mag-item__value">{{ magazine().name }}</span>
+  </div>
+
+  <div class="mag-item__col">
+    <span class="mag-item__label">Responsável Técnico</span>
+    <span class="mag-item__value">{{ magazine().responsavelTecnico }}</span>
+  </div>
+
+  <div class="mag-item__col">
+    <span class="mag-item__label">ISSN</span>
+    <span class="mag-item__value mag-item__value--badge">{{ magazine().issn }}</span>
+  </div>
+
+  <div class="mag-item__col">
+    <span class="mag-item__label">Email</span>
+    <span class="mag-item__value">{{ magazine().email }}</span>
+  </div>
+
+  <div class="mag-item__col">
+    <span class="mag-item__label">CNPJ</span>
+    <span class="mag-item__value">{{ magazine().cnpj || '—' }}</span>
+  </div>
+</div>

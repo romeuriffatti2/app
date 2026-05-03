@@ -1,12 +1,11 @@
 <nav class="navbar">
-    <h1 class="logo" routerLink="/">CERT</h1>
+    <h1 class="logo" routerLink="/">CEEINTER</h1>
 
-    <div class="nav-links" style="display: flex; gap: 20px; align-items: center;">
+    <div class="nav-links">
         @if (isLoggedIn()) {
-            <a routerLink="/" style="color: #666; text-decoration: none;">Início</a>
-            <a routerLink="/templates" style="color: #6366f1; text-decoration: none; font-weight: 600;">Templates</a>
+            <a routerLink="/templates" class="nav-link" routerLinkActive="active">Templates</a>
         }
-        <a routerLink="/validate_cert" style="color: #666; text-decoration: none;">Validar</a>
+        <a routerLink="/validate_cert" class="nav-link" routerLinkActive="active">Validar</a>
     </div>
 
     <div class="nav-actions">

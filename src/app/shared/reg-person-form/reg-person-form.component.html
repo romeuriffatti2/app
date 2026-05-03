@@ -1,0 +1,33 @@
+<form [formGroup]="personForm" (ngSubmit)="handleSubmit()">
+
+    <div class="form-group">
+        <label for="name">Nome Completo</label>
+        <input id="name" formControlName="name" placeholder="Ex: Maria Silva">
+        @if(personForm.get('name')?.touched && personForm.get('name')?.invalid){
+        <span class="error">Nome obrigatório (mín. 3 caracteres)</span>
+        }
+    </div>
+
+    <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" formControlName="email" placeholder="Ex: maria@email.com">
+        @if(personForm.get('email')?.touched && personForm.get('email')?.invalid){
+        <span class="error">Email inválido</span>
+        }
+    </div>
+
+    <div class="form-group">
+        <label for="cpf">CPF</label>
+        <input
+            id="cpf"
+            formControlName="cpf"
+            placeholder="000.000.000-00"
+            mask="000.000.000-00">
+        @if(personForm.get('cpf')?.touched && personForm.get('cpf')?.invalid){
+        <span class="error">CPF inválido</span>
+        }
+    </div>
+
+    <app-secondary-button [text]="'Registrar'" [type]="'submit'"></app-secondary-button>
+
+</form>
