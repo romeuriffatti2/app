@@ -9,6 +9,9 @@ export interface CertificateRequest {
 
 export interface CertificateItemRequest {
     name: string;
+    email?: string;
+    personId?: number;
     validationCode: string;
+    pdfBase64?: string;
     metadata?: any;
 }

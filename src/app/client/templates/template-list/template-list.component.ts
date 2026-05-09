@@ -1,13 +1,13 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TemplateService } from '../../../services/template.service';
 import { PdfmeTemplate } from '../../../models/template.model';
 
 @Component({
   selector: 'app-template-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './template-list.component.html',
   styleUrl: './template-list.component.css'
 })
@@ -69,20 +69,7 @@ export class TemplateListComponent implements OnInit {
     });
   }
 
-  deleteTemplate(template: PdfmeTemplate) {
-    if (!confirm(`Deletar "${template.name}"? Esta ação é irreversível.`)) return;
-    this.actionLoading.set(template.id);
-    this.templateService.delete(template.id).subscribe({
-      next: () => {
-        this.templates.update(list => list.filter(t => t.id !== template.id));
-        this.actionLoading.set(null);
-      },
-      error: (err) => {
-        alert(err?.error?.message || 'Não foi possível deletar o template.');
-        this.actionLoading.set(null);
-      }
-    });
-  }
+
 
   createNew() {
     const name = prompt('Nome do novo template:');

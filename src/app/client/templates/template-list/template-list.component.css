@@ -159,62 +159,7 @@
   color: #475569;
 }
 
-/* ── Preview mockup ──────────────────────────────────────────── */
-.card-preview {
-  background: #1e293b;
-  border-radius: 10px;
-  padding: 1rem;
-  height: 90px;
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 1rem;
-}
 
-.preview-lines {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.preview-line {
-  height: 8px;
-  background: #334155;
-  border-radius: 4px;
-  opacity: 0.7;
-}
-.preview-line.long { width: 90%; }
-.preview-line.medium { width: 65%; }
-.preview-line.short { width: 40%; }
-
-.preview-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(17,24,39,.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-.template-card:hover .preview-overlay {
-  opacity: 1;
-}
-
-.btn-preview {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  background: #6366f1;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.btn-preview:hover { background: #4f46e5; }
 
 /* ── Action bar ──────────────────────────────────────────────── */
 .card-actions {
@@ -245,7 +190,6 @@
 .action-btn.edit    { background: #6366f11a; color: #818cf8; border-color: #6366f133; }
 .action-btn.clone   { background: #0ea5e91a; color: #38bdf8; border-color: #0ea5e933; }
 .action-btn.reset   { background: #f59e0b1a; color: #fbbf24; border-color: #f59e0b33; }
-.action-btn.delete  { background: #ef44441a; color: #f87171; border-color: #ef444433; }
 
 .action-btn:hover { filter: brightness(1.2); transform: translateY(-1px); }
 

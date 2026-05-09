@@ -11,6 +11,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Designer } from '@pdfme/ui';
 import { getDefaultFont } from '@pdfme/common';
+import { text, image } from '@pdfme/schemas';
+import { PDFDocument } from 'pdf-lib';
 import { TemplateService } from '../../../services/template.service';
 
 @Component({
@@ -48,22 +50,29 @@ export class TemplateEditorComponent implements AfterViewInit, OnDestroy {
     this.templateService.getById(this.templateId).subscribe({
       next: (template) => {
         this.templateName.set(template.name);
-        const blankPdf = { width: 297, height: 210 };
+        const blankPdf = { width: 297, height: 210, padding: [0, 0, 0, 0] };
         let schema: any;
         try {
-          schema = JSON.parse(template.jsonSchema);
-        } catch {
+          const cleanJson = template.jsonSchema ?? '{}';
+          schema = JSON.parse(cleanJson);
+        } catch (e) {
+          console.error('Erro ao fazer o parse do JSON do banco:', e);
           schema = { basePdf: blankPdf, schemas: [[]] };
         }
 
         if (!schema.basePdf) schema.basePdf = blankPdf;
+        if (typeof schema.basePdf === 'object' && schema.basePdf !== null && !Array.isArray(schema.basePdf) && !schema.basePdf.padding) {
+          schema.basePdf.padding = [0, 0, 0, 0];
+        }
         if (!schema.schemas || !Array.isArray(schema.schemas)) schema.schemas = [[]];
         
-        // If basePdf is a string, it's either an old/broken base64 or a corrupted JSON string
-        // In all cases, if it's a string, we migrate it to our new stable object format
+        // Se basePdf for uma string válida de data URI (base64 de imagem/pdf), nós a mantemos.
+        // Caso contrário (string vazia, objeto malformado, etc), resetamos para folha em branco.
         if (typeof schema.basePdf === 'string') {
-          console.log('Migrating string-based basePdf to object format');
-          schema.basePdf = blankPdf;
+          if (!schema.basePdf.startsWith('data:')) {
+            console.log('Migrating invalid string-based basePdf to object format');
+            schema.basePdf = blankPdf;
+          }
         }
         this.loading.set(false);
         setTimeout(() => {
@@ -71,6 +80,7 @@ export class TemplateEditorComponent implements AfterViewInit, OnDestroy {
             this.designer = new Designer({
               domContainer: this.container.nativeElement,
               template: schema,
+              plugins: { text, image },
               options: {
                 font: getDefaultFont(),
                 lang: 'en',
@@ -118,17 +128,46 @@ export class TemplateEditorComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  uploadBackground(event: Event) {
+  async uploadBackground(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file || !this.designer) return;
 
-    const reader = new FileReader();
-    reader.onload = () => {
+    this.loading.set(true);
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdfDoc = await PDFDocument.create();
+      
+      // A4 landscape dimensions em pontos (297x210 mm)
+      const page = pdfDoc.addPage([841.89, 595.28]);
+
+      let imageToEmbed;
+      if (file.type === 'image/png') {
+        imageToEmbed = await pdfDoc.embedPng(arrayBuffer);
+      } else if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
+        imageToEmbed = await pdfDoc.embedJpg(arrayBuffer);
+      } else {
+        throw new Error('Formato não suportado. Use PNG ou JPG.');
+      }
+
+      page.drawImage(imageToEmbed, {
+        x: 0,
+        y: 0,
+        width: 841.89,
+        height: 595.28,
+      });
+
+      const pdfBytes = await pdfDoc.saveAsBase64({ dataUri: true });
+
       const template = this.designer.getTemplate();
-      template.basePdf = reader.result as string;
+      template.basePdf = pdfBytes;
       this.designer.updateTemplate(template);
-    };
-    reader.readAsDataURL(file);
+    } catch (e) {
+      console.error('Erro ao processar imagem de fundo:', e);
+      this.error.set('Erro ao processar imagem de fundo. Use formato PNG ou JPG.');
+    } finally {
+      this.loading.set(false);
+      (event.target as HTMLInputElement).value = '';
+    }
   }
 
   goBack() {

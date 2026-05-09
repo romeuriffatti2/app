@@ -1,4 +1,5 @@
 import { Component, HostListener, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { NavbarComponent } from "../shared/navbar/navbar.component";
 import { GenCertFormComponent } from "../shared/gen-cert-form/gen-cert-form.component";
 import { RegMagFormComponent } from "../shared/reg-mag-form/reg-mag-form.component";
@@ -9,7 +10,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-home-page',
-  imports: [CommonModule, NavbarComponent, GenCertFormComponent, RegMagFormComponent, RegPersonFormComponent, MagListComponent, PersonListComponent],
+  imports: [CommonModule, RouterLink, NavbarComponent, GenCertFormComponent, RegMagFormComponent, RegPersonFormComponent, MagListComponent, PersonListComponent],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css',
 })

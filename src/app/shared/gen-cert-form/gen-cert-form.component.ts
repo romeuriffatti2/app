@@ -10,7 +10,9 @@ import { CertificateItemRequest, CertificateRequest } from '../../models/certifi
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { PersonService } from '../../services/person.service';
 import { PersonResponse } from '../../models/person.interface';
-
+import { TemplateService } from '../../services/template.service';
+import { generate } from '@pdfme/generator';
+import { text, image, barcodes } from '@pdfme/schemas';
 @Component({
   selector: 'app-gen-cert-form',
   standalone: true,
@@ -25,6 +27,7 @@ export class GenCertFormComponent implements OnInit {
   private magazineService = inject(MagazineService);
   private certificateService = inject(CertificateService);
   private personService = inject(PersonService);
+  private templateService = inject(TemplateService);
 
   protected magazines = signal<MagazineResponse[]>([]);
   protected allPersons = signal<PersonResponse[]>([]);
@@ -53,6 +56,7 @@ export class GenCertFormComponent implements OnInit {
     number: new FormControl(''),
     manualName: new FormControl(''),
     manualCpf: new FormControl(''),
+    manualEmail: new FormControl(''),
     evaluationId: new FormControl(''),
     cpf: new FormControl(''),
     startDate: new FormControl(''),
@@ -129,26 +133,29 @@ export class GenCertFormComponent implements OnInit {
 
     const nameControl = this.certificadoForm.get('manualName');
     const cpfControl = this.certificadoForm.get('manualCpf');
+    const emailControl = this.certificadoForm.get('manualEmail');
     const name = nameControl?.value?.trim();
     const cpf = cpfControl?.value?.trim();
+    const email = emailControl?.value?.trim();
 
     if (!name) {
       this.toastr.warning("Nome é obrigatório.");
       return;
     }
 
-    this.addPersonToList(name, cpf);
+    this.addPersonToList(name, cpf, email);
 
     nameControl?.setValue('');
     cpfControl?.setValue('');
+    emailControl?.setValue('');
   }
 
   protected addPersonFromSearch(person: PersonResponse): void {
-    this.addPersonToList(person.name, person.cpf);
+    this.addPersonToList(person.name, person.cpf, person.email, person.id);
     this.searchQuery.set('');
   }
 
-  private addPersonToList(name: string, cpf?: string | null): void {
+  private addPersonToList(name: string, cpf?: string | null, email?: string | null, personId?: number | null): void {
     if (this.manualNames().some(n => n.name === name && n.metadata?.cpf === cpf)) {
       this.toastr.warning("Esta pessoa já foi adicionada.");
       return;
@@ -156,6 +163,8 @@ export class GenCertFormComponent implements OnInit {
 
     const newItem: CertificateItemRequest = {
       name,
+      email: email || undefined,
+      personId: personId || undefined,
       validationCode: crypto.randomUUID(),
       metadata: {
         evaluationId: this.certificadoForm.get('evaluationId')?.value || null,
@@ -193,24 +202,101 @@ export class GenCertFormComponent implements OnInit {
       certificates: this.manualNames()
     };
 
-    this.certificateService.generateCertificates(request).subscribe({
-      next: (blob: Blob) => {
-        this.toastr.success("Certificados gerados com sucesso!");
+    // 1. Busca o template do sistema (ou do usuário) para o tipo selecionado
+    this.templateService.getByType(request.type).subscribe({
+      next: async (res) => {
+        try {
+          if (!res.jsonSchema) {
+            this.toastr.error("Template não possui um layout configurado.");
+            return;
+          }
 
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'certificados.pdf';
-        link.click();
-        window.URL.revokeObjectURL(url);
+          // Trata barras invertidas do JSON armazenado no banco
+          console.log('JSON Schema bruto do banco:', res.jsonSchema);
+          const templateJson = JSON.parse(res.jsonSchema);
+          console.log('Template parseado para PDFME:', templateJson);
 
-        this.certificadoForm.reset({ generationType: 'manual' });
-        this.manualNames.set([]);
-        this.currentStep.set(1);
+          // Pega o nome da revista
+          const magazine = this.magazines().find(m => m.id === request.magazineId);
+          const magazineName = magazine?.name || '';
+          const issn = magazine?.issn || '';
+          const magazineEmail = magazine?.email || '';
+          const now = new Date();
+          const year = String(now.getFullYear());
+          const date = now.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+          // Monta os inputs para o PDFME baseando-se nos metadados
+          const inputs = request.certificates.map(item => ({
+            name: item.name,
+            cpf: item.metadata?.cpf || '',
+            validationCode: item.validationCode,
+            magazineName: magazineName,
+            issn: issn,
+            email: magazineEmail,
+            year: year,
+            date: date,
+            volume: request.volume,
+            number: request.number,
+            dossieTitle: item.metadata?.dossieTitle || '',
+            articleTitle: item.metadata?.articleTitle || '',
+            publishMonthYear: item.metadata?.publishMonthYear || '',
+            doi: item.metadata?.doi || '',
+            accessLink: item.metadata?.accessLink || '',
+            startDate: item.metadata?.startDate || '',
+            endDate: item.metadata?.endDate || ''
+          }));
+
+          const plugins = { text, image, qrcode: barcodes.qrcode };
+
+          // 2. Gera o PDF mesclado para download do usuário
+          const pdfMerged = await generate({ template: templateJson, plugins, inputs });
+          
+          // 3. Gera os PDFs individuais em Base64 para envio ao backend (e-mails individuais)
+          for (let i = 0; i < request.certificates.length; i++) {
+            const singlePdf = await generate({ template: templateJson, plugins, inputs: [inputs[i]] });
+            request.certificates[i].pdfBase64 = this.uint8ArrayToBase64(singlePdf);
+          }
+
+          // 4. Envia para o backend para salvar e disparar e-mails
+          this.certificateService.generateCertificates(request).subscribe({
+            next: () => {
+              this.toastr.success("Certificados gerados e processados com sucesso!");
+
+              // Dispara download do arquivo único (com várias páginas)
+              const blob = new Blob([pdfMerged], { type: 'application/pdf' });
+              const url = window.URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = 'certificados.pdf';
+              link.click();
+              window.URL.revokeObjectURL(url);
+
+              this.certificadoForm.reset({ generationType: 'manual' });
+              this.manualNames.set([]);
+              this.currentStep.set(1);
+            },
+            error: () => {
+              this.toastr.error("Erro ao comunicar com o servidor.");
+            }
+          });
+
+        } catch (e) {
+          console.error(e);
+          this.toastr.error("Erro ao gerar PDF localmente.");
+        }
       },
       error: () => {
-        this.toastr.error("Erro ao gerar certificados.");
+        this.toastr.error("Erro ao buscar o template para o certificado.");
       }
     });
+  }
+
+  private uint8ArrayToBase64(bytes: Uint8Array): string {
+    let binary = '';
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
   }
 }

@@ -23,6 +23,11 @@ export class TemplateService {
     return this.http.get<PdfmeTemplate>(`${this.base}/${id}`);
   }
 
+  /** Busca o template ativo para o tipo informado */
+  getByType(type: string): Observable<PdfmeTemplate> {
+    return this.http.get<PdfmeTemplate>(`${this.base}/type/${type}`);
+  }
+
   /** Salva edições (nome e/ou jsonSchema) de um template */
   save(id: number, req: SaveTemplateRequest): Observable<PdfmeTemplate> {
     return this.http.put<PdfmeTemplate>(`${this.base}/${id}`, req);
@@ -38,10 +43,7 @@ export class TemplateService {
     return this.http.post<PdfmeTemplate>(`${this.base}/${id}/clone`, {});
   }
 
-  /** Deleta um template */
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.base}/${id}`);
-  }
+
 
   /** Reseta o jsonSchema de volta ao template padrão do sistema de origem */
   resetToDefault(id: number): Observable<PdfmeTemplate> {

@@ -7,9 +7,21 @@
         <nav class="sidebar-nav">
             <button
                 class="sidebar-item"
+                routerLink="/templates">
+                <span class="sidebar-icon">📄</span>
+                Templates
+            </button>
+            <button
+                class="sidebar-item"
+                routerLink="/validate_cert">
+                <span class="sidebar-icon">✅</span>
+                Validar
+            </button>
+            <button
+                class="sidebar-item"
                 [class.active]="isCertFormOpen()"
                 (click)="onOpenForm()">
-                <span class="sidebar-icon">📄</span>
+                <span class="sidebar-icon">🎓</span>
                 Gerar Certificado
             </button>
 

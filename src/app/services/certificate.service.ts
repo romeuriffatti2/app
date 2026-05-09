@@ -10,7 +10,7 @@ import { CertificateRequest } from '../models/certificate-request.interface';
 export class CertificateService {
   private http = inject(HttpClient)
 
-  public generateCertificates(request: CertificateRequest): Observable<Blob> {
-    return this.http.post(API_BASE_URL + "/certificate/generate", request, { responseType: 'blob' })
+  public generateCertificates(request: CertificateRequest): Observable<void> {
+    return this.http.post<void>(API_BASE_URL + "/certificate/generate", request)
   }
 }

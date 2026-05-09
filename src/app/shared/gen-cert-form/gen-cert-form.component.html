@@ -165,6 +165,10 @@
                 <label>CPF <span class="optional">(opcional)</span></label>
                 <input type="text" formControlName="manualCpf" placeholder="000.000.000-00" mask="000.000.000-00">
             </div>
+            <div class="field">
+                <label>E-mail <span class="optional">(opcional)</span></label>
+                <input type="text" formControlName="manualEmail" placeholder="exemplo@email.com">
+            </div>
         </div>
         <app-secondary-button [text]="'Adicionar à Lista'" type="button" (click)="addManualName($event)"></app-secondary-button>
     } @else {
