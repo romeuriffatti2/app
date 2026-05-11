@@ -26,7 +26,7 @@
             <option value="">Selecione</option>
             <option value="parecerista">Parecerista</option>
             <option value="corpo-editorial">Corpo editorial</option>
-            <option value="comite-tematico">Comitê temático</option>
+            <option value="dossie">Dossiê Temático</option>
             <option value="aceite">Aceite</option>
             <option value="publicacao">Publicação</option>
         </select>
@@ -67,7 +67,7 @@
                 }
             </select>
         </div>
-        
+
         <div class="field">
             <label>Número</label>
             <select formControlName="number">
@@ -87,31 +87,24 @@
     </div>
     }
 
-    @if (certificadoForm.get('certificationType')?.value === 'corpo-editorial' || certificadoForm.get('certificationType')?.value === 'comite-tematico') {
-    <div class="form-group">
-        <label>CPF</label>
-        <input type="text" formControlName="cpf" placeholder="Ex: 000.000.000-00">
-    </div>
-    <div class="form-group row-group">
+    @if (certificadoForm.get('certificationType')?.value === 'corpo-editorial') {
+    <div class="form-group column-group">
         <label>Data de Início</label>
-        <input type="text" formControlName="startDate" placeholder="Ex: 01/01/2023">
+        <input type="text" formControlName="startDate" placeholder="Ex: 01/01/2023" mask="00/00/0000">
         <label>Data de Término</label>
-        <input type="text" formControlName="endDate" placeholder="Ex: até a presente data">
+        <input type="text" formControlName="endDate" placeholder="Ex: 01/01/2023" mask="00/00/0000">
     </div>
     }
 
     @if (certificadoForm.get('certificationType')?.value === 'dossie') {
-    <div class="form-group">
-        <label>CPF</label>
-        <input type="text" formControlName="cpf" placeholder="Ex: 000.000.000-00">
-    </div>
     <div class="form-group">
         <label>Título do Dossiê</label>
         <input type="text" formControlName="dossieTitle" placeholder="Ex: Temas em Educação">
     </div>
     }
 
-    @if (certificadoForm.get('certificationType')?.value === 'aceite' || certificadoForm.get('certificationType')?.value === 'publicacao') {
+    @if (certificadoForm.get('certificationType')?.value === 'aceite' || certificadoForm.get('certificationType')?.value
+    === 'publicacao') {
     <div class="form-group">
         <label>Título do Artigo</label>
         <input type="text" formControlName="articleTitle" placeholder="Ex: O impacto socioeconômico...">
@@ -121,7 +114,7 @@
     @if (certificadoForm.get('certificationType')?.value === 'aceite') {
     <div class="form-group">
         <label>Mês e Ano de Publicação</label>
-        <input type="text" formControlName="publishMonthYear" placeholder="Ex: Dezembro/2025">
+        <input type="text" formControlName="publishMonthYear" placeholder="Ex: 03/2025" mask="00/0000">
     </div>
     }
 
@@ -149,53 +142,56 @@
 
     <div class="form-group">
         <label>Modo de inserção de destinatários</label>
-        <select [ngModel]="recipientMode()" (ngModelChange)="recipientMode.set($event)" [ngModelOptions]="{standalone: true}">
+        <select [ngModel]="recipientMode()" (ngModelChange)="recipientMode.set($event)"
+            [ngModelOptions]="{standalone: true}">
             <option value="manual">Adicionar Manualmente</option>
             <option value="search">Pesquisar Pessoas</option>
         </select>
     </div>
 
     @if (recipientMode() === 'manual') {
-        <div class="form-group row-group">
-            <div class="field">
-                <label>Nome da Pessoa</label>
-                <input type="text" formControlName="manualName" placeholder="Digite o nome completo">
-            </div>
-            <div class="field">
-                <label>CPF <span class="optional">(opcional)</span></label>
-                <input type="text" formControlName="manualCpf" placeholder="000.000.000-00" mask="000.000.000-00">
-            </div>
-            <div class="field">
-                <label>E-mail <span class="optional">(opcional)</span></label>
-                <input type="text" formControlName="manualEmail" placeholder="exemplo@email.com">
-            </div>
+    <div class="form-group column-group">
+        <div class="field">
+            <label>Nome da Pessoa</label>
+            <input type="text" formControlName="manualName" placeholder="Digite o nome completo">
         </div>
-        <app-secondary-button [text]="'Adicionar à Lista'" type="button" (click)="addManualName($event)"></app-secondary-button>
+        <div class="field">
+            <label>CPF <span class="optional">(opcional)</span></label>
+            <input type="text" formControlName="manualCpf" placeholder="000.000.000-00" mask="000.000.000-00">
+        </div>
+        <div class="field">
+            <label>E-mail <span class="optional">(opcional)</span></label>
+            <input type="text" formControlName="manualEmail" placeholder="exemplo@email.com">
+        </div>
+    </div>
+    <app-secondary-button [text]="'Adicionar à Lista'" type="button"
+        (click)="addManualName($event)"></app-secondary-button>
     } @else {
-        <div class="form-group">
-            <label>Pesquisar Pessoa</label>
-            <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" [ngModelOptions]="{standalone: true}" placeholder="Digite o nome ou CPF...">
-        </div>
+    <div class="form-group">
+        <label>Pesquisar Pessoa</label>
+        <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
+            [ngModelOptions]="{standalone: true}" placeholder="Digite o nome ou CPF...">
+    </div>
 
-        @if (searchQuery().length > 0) {
-            <div class="search-results">
-                @if (filteredPersons().length === 0) {
-                    <p class="empty-list">Nenhuma pessoa encontrada.</p>
-                } @else {
-                    <ul class="person-search-list">
-                        @for (person of filteredPersons(); track person.id) {
-                            <li class="person-search-item">
-                                <div class="person-info">
-                                    <span class="person-name">{{ person.name }}</span>
-                                    <span class="person-cpf">{{ person.cpf }}</span>
-                                </div>
-                                <button type="button" class="add-button" (click)="addPersonFromSearch(person)">Adicionar</button>
-                            </li>
-                        }
-                    </ul>
-                }
-            </div>
+    @if (searchQuery().length > 0) {
+    <div class="search-results">
+        @if (filteredPersons().length === 0) {
+        <p class="empty-list">Nenhuma pessoa encontrada.</p>
+        } @else {
+        <ul class="person-search-list">
+            @for (person of filteredPersons(); track person.id) {
+            <li class="person-search-item">
+                <div class="person-info">
+                    <span class="person-name">{{ person.name }}</span>
+                    <span class="person-cpf">{{ person.cpf }}</span>
+                </div>
+                <button type="button" class="add-button" (click)="addPersonFromSearch(person)">Adicionar</button>
+            </li>
+            }
+        </ul>
         }
+    </div>
+    }
     }
 
     <div class="names-list-container">

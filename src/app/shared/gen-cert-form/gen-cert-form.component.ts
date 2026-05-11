@@ -13,6 +13,7 @@ import { PersonResponse } from '../../models/person.interface';
 import { TemplateService } from '../../services/template.service';
 import { generate } from '@pdfme/generator';
 import { text, image, barcodes } from '@pdfme/schemas';
+import { getDefaultFont } from '@pdfme/common';
 @Component({
   selector: 'app-gen-cert-form',
   standalone: true,
@@ -225,35 +226,70 @@ export class GenCertFormComponent implements OnInit {
           const year = String(now.getFullYear());
           const date = now.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
 
-          // Monta os inputs para o PDFME baseando-se nos metadados
-          const inputs = request.certificates.map(item => ({
-            name: item.name,
-            cpf: item.metadata?.cpf || '',
-            validationCode: item.validationCode,
-            magazineName: magazineName,
-            issn: issn,
-            email: magazineEmail,
-            year: year,
-            date: date,
-            volume: request.volume,
-            number: request.number,
-            dossieTitle: item.metadata?.dossieTitle || '',
-            articleTitle: item.metadata?.articleTitle || '',
-            publishMonthYear: item.metadata?.publishMonthYear || '',
-            doi: item.metadata?.doi || '',
-            accessLink: item.metadata?.accessLink || '',
-            startDate: item.metadata?.startDate || '',
-            endDate: item.metadata?.endDate || ''
-          }));
+          // Extrai o primeiro array de schemas (geralmente só tem um para uma página)
+          const pageSchemas = templateJson.schemas[0] || [];
+
+          // Monta os inputs para o PDFME fazendo a interpolação manual do texto
+          const inputs = request.certificates.map(item => {
+            const rawData: Record<string, string> = {
+              name: item.name || '',
+              cpf: item.metadata?.cpf || '',
+              validationCode: item.validationCode || '',
+              evaluationId: item.metadata?.evaluationId || '',
+              magazineName: magazineName,
+              issn: issn,
+              email: magazineEmail,
+              year: year,
+              date: date,
+              volume: request.volume || '',
+              number: request.number || '',
+              dossieTitle: item.metadata?.dossieTitle || '',
+              articleTitle: item.metadata?.articleTitle || '',
+              publishMonthYear: item.metadata?.publishMonthYear || '',
+              doi: item.metadata?.doi || '',
+              accessLink: item.metadata?.accessLink || '',
+              startDate: item.metadata?.startDate || '',
+              endDate: item.metadata?.endDate || ''
+            };
+
+            const interpolatedInput: Record<string, string> = {};
+            
+            // Para cada campo definido no schema, nós pegamos o 'content' padrão
+            // e substituímos as tags {{variavel}} pelo valor correspondente em rawData
+            pageSchemas.forEach((schemaField: any) => {
+              if (schemaField.type === 'text') {
+                let textContent = schemaField.content || '';
+                Object.keys(rawData).forEach(key => {
+                  const regex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
+                  textContent = textContent.replace(regex, rawData[key]);
+                });
+                interpolatedInput[schemaField.name] = textContent;
+              } else {
+                 interpolatedInput[schemaField.name] = schemaField.content || '';
+              }
+            });
+
+            return interpolatedInput;
+          });
 
           const plugins = { text, image, qrcode: barcodes.qrcode };
+          const options = { font: getDefaultFont() };
 
           // 2. Gera o PDF mesclado para download do usuário
-          const pdfMerged = await generate({ template: templateJson, plugins, inputs });
+          const pdfMerged = await generate({ template: templateJson, plugins, inputs, options });
           
+          // Dispara download do arquivo único (com várias páginas) imediatamente antes da req assíncrona
+          const blob = new Blob([pdfMerged], { type: 'application/pdf' });
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = 'certificados.pdf';
+          link.click();
+          window.URL.revokeObjectURL(url);
+
           // 3. Gera os PDFs individuais em Base64 para envio ao backend (e-mails individuais)
           for (let i = 0; i < request.certificates.length; i++) {
-            const singlePdf = await generate({ template: templateJson, plugins, inputs: [inputs[i]] });
+            const singlePdf = await generate({ template: templateJson, plugins, inputs: [inputs[i]], options });
             request.certificates[i].pdfBase64 = this.uint8ArrayToBase64(singlePdf);
           }
 
@@ -261,16 +297,6 @@ export class GenCertFormComponent implements OnInit {
           this.certificateService.generateCertificates(request).subscribe({
             next: () => {
               this.toastr.success("Certificados gerados e processados com sucesso!");
-
-              // Dispara download do arquivo único (com várias páginas)
-              const blob = new Blob([pdfMerged], { type: 'application/pdf' });
-              const url = window.URL.createObjectURL(blob);
-              const link = document.createElement('a');
-              link.href = url;
-              link.download = 'certificados.pdf';
-              link.click();
-              window.URL.revokeObjectURL(url);
-
               this.certificadoForm.reset({ generationType: 'manual' });
               this.manualNames.set([]);
               this.currentStep.set(1);

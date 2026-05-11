@@ -22,7 +22,12 @@ form {
 }
 
 .row-group {
-    flex-direction: row !important;
+    flex-direction: row;
+    gap: 16px;
+}
+
+.column-group {
+    flex-direction: column;
     gap: 16px;
 }
 
@@ -217,7 +222,7 @@ form>app-secondary-button {
     background: #fff;
     max-height: 200px;
     overflow-y: auto;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .person-search-list {
