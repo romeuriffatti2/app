@@ -222,6 +222,7 @@ export class GenCertFormComponent implements OnInit {
           const magazineName = magazine?.name || '';
           const issn = magazine?.issn || '';
           const magazineEmail = magazine?.email || '';
+          const responsavelTecnico = magazine?.responsavelTecnico || '';
           const now = new Date();
           const year = String(now.getFullYear());
           const date = now.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
@@ -239,6 +240,7 @@ export class GenCertFormComponent implements OnInit {
               magazineName: magazineName,
               issn: issn,
               email: magazineEmail,
+              responsavelTecnico: responsavelTecnico,
               year: year,
               date: date,
               volume: request.volume || '',
