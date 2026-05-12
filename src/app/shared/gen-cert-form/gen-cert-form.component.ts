@@ -11,6 +11,7 @@ import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { PersonService } from '../../services/person.service';
 import { PersonResponse } from '../../models/person.interface';
 import { TemplateService } from '../../services/template.service';
+import { PdfmeTemplate } from '../../models/template.model';
 import { generate } from '@pdfme/generator';
 import { text, image, barcodes } from '@pdfme/schemas';
 import { getDefaultFont } from '@pdfme/common';
@@ -32,6 +33,7 @@ export class GenCertFormComponent implements OnInit {
 
   protected magazines = signal<MagazineResponse[]>([]);
   protected allPersons = signal<PersonResponse[]>([]);
+  protected templates = signal<PdfmeTemplate[]>([]);
 
   protected currentStep = signal<number>(1);
   protected manualNames = signal<CertificateItemRequest[]>([]);
@@ -51,7 +53,7 @@ export class GenCertFormComponent implements OnInit {
 
   protected certificadoForm = new FormGroup({
     generationType: new FormControl('manual', Validators.required),
-    certificationType: new FormControl('', Validators.required),
+    templateId: new FormControl<number | null>(null, Validators.required),
     magazine: new FormControl('', Validators.required),
     volume: new FormControl(''),
     number: new FormControl(''),
@@ -71,19 +73,36 @@ export class GenCertFormComponent implements OnInit {
 
   private errorMessages: Record<string, any> = {
     generationType: { required: 'Selecione a modalidade' },
-    certificationType: { required: 'Selecione o tipo de certificado' },
+    templateId: { required: 'Selecione um template' },
     magazine: { required: 'Selecione uma revista' }
   };
+
+  get selectedTemplateType(): string {
+    const templateId = this.certificadoForm.get('templateId')?.value;
+    if (!templateId) return '';
+    const template = this.templates().find(t => t.id === Number(templateId));
+    return template?.type || '';
+  }
 
   ngOnInit() {
     this.getMagazines();
     this.getPersons();
+    this.getTemplates();
   }
 
   private getMagazines(): void {
     this.magazineService.getAllMagazines().subscribe({
       next: (res) => this.magazines.set(res),
       error: () => this.toastr.error("Não foi possível carregar as revistas"),
+    });
+  }
+
+  private getTemplates(): void {
+    this.templateService.listMyTemplates().subscribe({
+      next: (res) => {
+        this.templates.set(res);
+      },
+      error: () => this.toastr.error("Não foi possível carregar seus templates"),
     });
   }
 
@@ -109,7 +128,7 @@ export class GenCertFormComponent implements OnInit {
   }
 
   protected nextStep(): void {
-    const fields = ['generationType', 'certificationType', 'magazine'];
+    const fields = ['generationType', 'templateId', 'magazine'];
     let isValid = true;
     fields.forEach(field => {
       const control = this.certificadoForm.get(field);
@@ -195,16 +214,21 @@ export class GenCertFormComponent implements OnInit {
       return;
     }
 
+    const templateId = Number(this.certificadoForm.get('templateId')?.value);
+    const selectedTemplate = this.templates().find(t => t.id === templateId);
+    const type = selectedTemplate?.type || '';
+
     const request: CertificateRequest = {
       magazineId: Number(this.certificadoForm.get('magazine')?.value),
-      type: this.certificadoForm.get('certificationType')?.value || '',
+      type: type,
+      templateId: templateId,
       volume: this.certificadoForm.get('volume')?.value || '',
       number: this.certificadoForm.get('number')?.value || '',
       certificates: this.manualNames()
     };
 
-    // 1. Busca o template do sistema (ou do usuário) para o tipo selecionado
-    this.templateService.getByType(request.type).subscribe({
+    // 1. Usa o template selecionado que já foi carregado
+    this.templateService.getById(templateId).subscribe({
       next: async (res) => {
         try {
           if (!res.jsonSchema) {
@@ -267,7 +291,12 @@ export class GenCertFormComponent implements OnInit {
                 });
                 interpolatedInput[schemaField.name] = textContent;
               } else {
-                 interpolatedInput[schemaField.name] = schemaField.content || '';
+                // Se for imagem e existir um valor default no esquema (content), a gente usa ele.
+                // Se não existir, nós *não* adicionamos no input para que o PDFME use o comportamento padrão dele
+                // (e não sobrescreva com uma string vazia, o que apagaria a imagem do editor).
+                if (schemaField.content) {
+                  interpolatedInput[schemaField.name] = schemaField.content;
+                }
               }
             });
 

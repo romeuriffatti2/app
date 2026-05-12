@@ -1,0 +1,69 @@
+<div class="list-container">
+  @if (isLoading()) {
+    <div class="loading-state">Carregando certificados...</div>
+  } @else {
+    @if (certificates().length === 0) {
+      <div class="empty-state">
+        <span class="empty-icon">📭</span>
+        <p>Nenhum certificado emitido encontrado.</p>
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="list-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Revista</th>
+              <th>Tipo</th>
+              <th>Data Emissão</th>
+              <th class="actions-col">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (cert of certificates(); track cert.id) {
+              <tr>
+                <td>{{ cert.name }}</td>
+                <td>{{ cert.magazineResponse?.name || '-' }}</td>
+                <td>{{ cert.type }}</td>
+                <td>{{ cert.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td class="actions-col">
+                  <button 
+                    class="action-btn download-btn" 
+                    title="Baixar PDF" 
+                    (click)="onDownload(cert)"
+                    [disabled]="isActionLoading()">
+                    ⬇️
+                  </button>
+                  <button 
+                    class="action-btn email-btn" 
+                    title="Reenviar por E-mail" 
+                    (click)="onResendEmail(cert)"
+                    [disabled]="isActionLoading()">
+                    📧
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <button 
+          class="btn-secondary" 
+          [disabled]="page() === 0" 
+          (click)="prevPage()">
+          Anterior
+        </button>
+        <span class="page-info">Página {{ page() + 1 }} de {{ totalPages() }}</span>
+        <button 
+          class="btn-secondary" 
+          [disabled]="page() >= totalPages() - 1 || totalPages() === 0" 
+          (click)="nextPage()">
+          Próxima
+        </button>
+      </div>
+    }
+  }
+</div>

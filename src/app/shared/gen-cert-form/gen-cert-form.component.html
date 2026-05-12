@@ -21,19 +21,17 @@
     </div>
 
     <div class="form-group">
-        <label>Tipo de Certificado</label>
-        <select formControlName="certificationType">
-            <option value="">Selecione</option>
-            <option value="parecerista">Parecerista</option>
-            <option value="corpo-editorial">Corpo editorial</option>
-            <option value="dossie">Dossiê Temático</option>
-            <option value="aceite">Aceite</option>
-            <option value="publicacao">Publicação</option>
+        <label>Template do Certificado</label>
+        <select formControlName="templateId">
+            <option [ngValue]="null">Selecione</option>
+            @for (template of templates(); track template.id) {
+                <option [ngValue]="template.id">{{ template.name }}</option>
+            }
         </select>
 
-        @if (getErrorMessage('certificationType')) {
+        @if (getErrorMessage('templateId')) {
         <span class="error">
-            {{ getErrorMessage('certificationType') }}
+            {{ getErrorMessage('templateId') }}
         </span>
         }
     </div>
@@ -79,15 +77,15 @@
         </div>
     </div>
 
-    <!-- METADADOS DINÂMICOS CONFORME certificationType -->
-    @if (certificadoForm.get('certificationType')?.value === 'parecerista') {
+    <!-- METADADOS DINÂMICOS CONFORME selectedTemplateType -->
+    @if (selectedTemplateType === 'parecerista') {
     <div class="form-group">
         <label>ID da Avaliação</label>
         <input type="text" formControlName="evaluationId" placeholder="Ex: 54321">
     </div>
     }
 
-    @if (certificadoForm.get('certificationType')?.value === 'corpo-editorial') {
+    @if (selectedTemplateType === 'corpo-editorial') {
     <div class="form-group column-group">
         <label>Data de Início</label>
         <input type="text" formControlName="startDate" placeholder="Ex: 01/01/2023" mask="00/00/0000">
@@ -96,29 +94,28 @@
     </div>
     }
 
-    @if (certificadoForm.get('certificationType')?.value === 'dossie') {
+    @if (selectedTemplateType === 'dossie') {
     <div class="form-group">
         <label>Título do Dossiê</label>
         <input type="text" formControlName="dossieTitle" placeholder="Ex: Temas em Educação">
     </div>
     }
 
-    @if (certificadoForm.get('certificationType')?.value === 'aceite' || certificadoForm.get('certificationType')?.value
-    === 'publicacao') {
+    @if (selectedTemplateType === 'aceite' || selectedTemplateType === 'publicacao') {
     <div class="form-group">
         <label>Título do Artigo</label>
         <input type="text" formControlName="articleTitle" placeholder="Ex: O impacto socioeconômico...">
     </div>
     }
 
-    @if (certificadoForm.get('certificationType')?.value === 'aceite') {
+    @if (selectedTemplateType === 'aceite') {
     <div class="form-group">
         <label>Mês e Ano de Publicação</label>
         <input type="text" formControlName="publishMonthYear" placeholder="Ex: 03/2025" mask="00/0000">
     </div>
     }
 
-    @if (certificadoForm.get('certificationType')?.value === 'publicacao') {
+    @if (selectedTemplateType === 'publicacao') {
     <div class="form-group row-group">
         <div class="field">
             <label>DOI</label>

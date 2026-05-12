@@ -1,0 +1,86 @@
+<aside class="sidebar">
+    <nav class="sidebar-nav">
+        <button class="sidebar-item" routerLink="/templates">
+            <span class="sidebar-icon">📄</span>
+            Templates
+        </button>
+        <button class="sidebar-item" routerLink="/validate_cert">
+            <span class="sidebar-icon">✅</span>
+            Validar
+        </button>
+        <!-- Dropdown Certificados -->
+        <div class="sidebar-dropdown" [class.open]="isCertDropdownOpen()"
+            (clickOutside)="isCertDropdownOpen.set(false)">
+            <button class="sidebar-item sidebar-item--dropdown"
+                [class.active]="activeView() === 'cert' || activeView() === 'cert-list'"
+                (click)="onToggleCertDropdown()">
+                <span class="sidebar-icon">🎓</span>
+                Certificados
+                <span class="dropdown-arrow">{{ isCertDropdownOpen() ? '▲' : '▼' }}</span>
+            </button>
+
+            <div class="sidebar-submenu">
+                <button class="sidebar-subitem" [class.active]="activeView() === 'cert'"
+                    (click)="onSelectView('cert')">
+                    <span class="sidebar-icon">➕</span>
+                    Gerar Certificado
+                </button>
+                <button class="sidebar-subitem" [class.active]="activeView() === 'cert-list'"
+                    (click)="onSelectView('cert-list')">
+                    <span class="sidebar-icon">📋</span>
+                    Certificados Emitidos
+                </button>
+            </div>
+        </div>
+
+        <!-- Dropdown Revista -->
+        <div class="sidebar-dropdown" [class.open]="isMagazineDropdownOpen()"
+            (clickOutside)="isMagazineDropdownOpen.set(false)">
+            <button class="sidebar-item sidebar-item--dropdown"
+                [class.active]="activeView() === 'mag-form' || activeView() === 'mag-list'"
+                (click)="onToggleMagazineDropdown()">
+                <span class="sidebar-icon">📰</span>
+                Revista
+                <span class="dropdown-arrow">{{ isMagazineDropdownOpen() ? '▲' : '▼' }}</span>
+            </button>
+
+            <div class="sidebar-submenu">
+                <button class="sidebar-subitem" [class.active]="activeView() === 'mag-form'"
+                    (click)="onSelectView('mag-form')">
+                    <span class="sidebar-icon">➕</span>
+                    Cadastrar Revista
+                </button>
+                <button class="sidebar-subitem" [class.active]="activeView() === 'mag-list'"
+                    (click)="onSelectView('mag-list')">
+                    <span class="sidebar-icon">📋</span>
+                    Listar Revistas
+                </button>
+            </div>
+        </div>
+
+        <!-- Dropdown Pessoas -->
+        <div class="sidebar-dropdown" [class.open]="isPersonDropdownOpen()"
+            (clickOutside)="isPersonDropdownOpen.set(false)">
+            <button class="sidebar-item sidebar-item--dropdown"
+                [class.active]="activeView() === 'person-form' || activeView() === 'person-list'"
+                (click)="onTogglePersonDropdown()">
+                <span class="sidebar-icon">👤</span>
+                Pessoas
+                <span class="dropdown-arrow">{{ isPersonDropdownOpen() ? '▲' : '▼' }}</span>
+            </button>
+
+            <div class="sidebar-submenu">
+                <button class="sidebar-subitem" [class.active]="activeView() === 'person-form'"
+                    (click)="onSelectView('person-form')">
+                    <span class="sidebar-icon">➕</span>
+                    Cadastrar Pessoa
+                </button>
+                <button class="sidebar-subitem" [class.active]="activeView() === 'person-list'"
+                    (click)="onSelectView('person-list')">
+                    <span class="sidebar-icon">📋</span>
+                    Listar Pessoas
+                </button>
+            </div>
+        </div>
+    </nav>
+</aside>

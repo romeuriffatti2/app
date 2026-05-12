@@ -5,6 +5,7 @@ export interface CertificateRequest {
     type: string;
     volume: string;
     number: string;
+    templateId?: number;
 }
 
 export interface CertificateItemRequest {
