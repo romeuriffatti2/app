@@ -18,7 +18,6 @@ export const routes: Routes = [
     path: 'validate_cert',
     component: ValidateCertComponent
   },
-  // ─── Módulo de Templates (CLIENT e ADMIN) ──────────────────────────────────
   {
     path: 'templates',
     canActivate: [authGuard],
