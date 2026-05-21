@@ -1,0 +1,56 @@
+<form [formGroup]="userForm" (ngSubmit)="handleSubmit()">
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="user-name">Nome Completo</label>
+            <input id="user-name" formControlName="name" placeholder="Ex: João Silva">
+            @if (userForm.get('name')?.touched && userForm.get('name')?.invalid) {
+                <span class="error">Nome obrigatório (mín. 3 caracteres)</span>
+            }
+        </div>
+
+        <div class="form-group">
+            <label for="user-email">E-mail</label>
+            <input id="user-email" type="email" formControlName="email" placeholder="Ex: joao@email.com">
+            @if (userForm.get('email')?.touched && userForm.get('email')?.invalid) {
+                <span class="error">E-mail inválido</span>
+            }
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="user-cpf">CPF</label>
+            <input id="user-cpf" formControlName="cpf" placeholder="000.000.000-00" mask="000.000.000-00">
+            @if (userForm.get('cpf')?.touched && userForm.get('cpf')?.invalid) {
+                <span class="error">CPF inválido</span>
+            }
+        </div>
+
+        <div class="form-group">
+            <label for="user-birthdate">Data de Nascimento</label>
+            <input id="user-birthdate" type="date" formControlName="birthDate">
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="user-password">Senha</label>
+            <input id="user-password" type="password" formControlName="password" placeholder="Mín. 6 caracteres">
+            @if (userForm.get('password')?.touched && userForm.get('password')?.invalid) {
+                <span class="error">Senha obrigatória (mín. 6 caracteres)</span>
+            }
+        </div>
+
+        <div class="form-group">
+            <label for="user-role">Perfil de Acesso</label>
+            <select id="user-role" formControlName="role">
+                <option value="CLIENT">Cliente</option>
+                <option value="ADMIN">Administrador</option>
+            </select>
+        </div>
+    </div>
+
+    <app-secondary-button [text]="'Cadastrar Usuário'" [type]="'submit'"></app-secondary-button>
+
+</form>

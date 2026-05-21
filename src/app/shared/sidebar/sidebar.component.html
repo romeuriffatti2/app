@@ -82,5 +82,20 @@
                 </button>
             </div>
         </div>
+
+        <!-- Seção exclusiva ADMIN -->
+        @if (isAdmin()) {
+            <div class="sidebar-section-divider">
+                <span class="sidebar-section-label">Administração</span>
+            </div>
+
+            <button
+                class="sidebar-item sidebar-item--admin"
+                [class.active]="activeView() === 'user-form'"
+                (click)="onSelectView('user-form')">
+                <span class="sidebar-icon">👤</span>
+                Cadastrar Usuário
+            </button>
+        }
     </nav>
 </aside>

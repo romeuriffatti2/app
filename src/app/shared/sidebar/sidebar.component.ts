@@ -1,9 +1,10 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ClickOutsideDirective } from '../directives/click-outside.directive';
+import { AuthService } from '../../services/auth.service';
 
-export type ViewMode = 'cert' | 'cert-list' | 'mag-form' | 'mag-list' | 'person-form' | 'person-list' | 'none';
+export type ViewMode = 'cert' | 'cert-list' | 'mag-form' | 'mag-list' | 'person-form' | 'person-list' | 'user-form' | 'none';
 
 @Component({
   selector: 'app-sidebar',
@@ -13,6 +14,8 @@ export type ViewMode = 'cert' | 'cert-list' | 'mag-form' | 'mag-list' | 'person-
   styleUrl: './sidebar.component.css'
 })
 export class SidebarComponent {
+  private authService = inject(AuthService);
+
   // Input received from parent (HomePage) to know which item is active
   activeView = input<ViewMode>('none');
   
@@ -22,6 +25,10 @@ export class SidebarComponent {
   protected isCertDropdownOpen = signal<boolean>(false);
   protected isMagazineDropdownOpen = signal<boolean>(false);
   protected isPersonDropdownOpen = signal<boolean>(false);
+
+  protected isAdmin(): boolean {
+    return this.authService.isAdmin();
+  }
 
   protected onSelectView(view: ViewMode) {
     this.viewChange.emit(view);

@@ -8,6 +8,7 @@ import { PersonListComponent } from '../shared/person-list/person-list.component
 import { CommonModule } from '@angular/common';
 import { SidebarComponent, ViewMode } from '../shared/sidebar/sidebar.component';
 import { CertListComponent } from '../shared/cert-list/cert-list.component';
+import { RegUserFormComponent } from '../shared/reg-user-form/reg-user-form.component';
 
 @Component({
   selector: 'app-home-page',
@@ -21,7 +22,8 @@ import { CertListComponent } from '../shared/cert-list/cert-list.component';
     RegPersonFormComponent, 
     MagListComponent, 
     PersonListComponent,
-    CertListComponent
+    CertListComponent,
+    RegUserFormComponent
   ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css',

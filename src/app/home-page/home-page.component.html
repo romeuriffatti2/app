@@ -46,6 +46,12 @@
                     <app-person-list></app-person-list>
                 </div>
             }
+            @case ('user-form') {
+                <div class="form-card">
+                    <h2 class="form-title">Cadastrar Usuário</h2>
+                    <app-reg-user-form></app-reg-user-form>
+                </div>
+            }
             @default {
                 <div class="empty-state">
                     <span class="empty-icon">🏠</span>
