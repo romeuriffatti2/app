@@ -13,41 +13,41 @@ export class TemplateService {
 
   constructor(private http: HttpClient) {}
 
-  /** Lista todos os templates do usuário logado */
-  listMyTemplates(): Observable<PdfmeTemplate[]> {
-    return this.http.get<PdfmeTemplate[]>(this.base);
+  /** Lista todos os templates da revista */
+  listMyTemplates(magazineId: number): Observable<PdfmeTemplate[]> {
+    return this.http.get<PdfmeTemplate[]>(`${this.base}/magazine/${magazineId}`);
   }
 
   /** Busca um template por ID (com jsonSchema completo) */
-  getById(id: number): Observable<PdfmeTemplate> {
-    return this.http.get<PdfmeTemplate>(`${this.base}/${id}`);
+  getById(magazineId: number, id: number): Observable<PdfmeTemplate> {
+    return this.http.get<PdfmeTemplate>(`${this.base}/magazine/${magazineId}/${id}`);
   }
 
   /** Busca o template ativo para o tipo informado */
-  getByType(type: string): Observable<PdfmeTemplate> {
-    return this.http.get<PdfmeTemplate>(`${this.base}/type/${type}`);
+  getByType(magazineId: number, type: string): Observable<PdfmeTemplate> {
+    return this.http.get<PdfmeTemplate>(`${this.base}/magazine/${magazineId}/type/${type}`);
   }
 
   /** Salva edições (nome e/ou jsonSchema) de um template */
-  save(id: number, req: SaveTemplateRequest): Observable<PdfmeTemplate> {
-    return this.http.put<PdfmeTemplate>(`${this.base}/${id}`, req);
+  save(magazineId: number, id: number, req: SaveTemplateRequest): Observable<PdfmeTemplate> {
+    return this.http.put<PdfmeTemplate>(`${this.base}/magazine/${magazineId}/${id}`, req);
   }
 
   /** Cria um novo template customizado do zero */
-  create(req: SaveTemplateRequest): Observable<PdfmeTemplate> {
-    return this.http.post<PdfmeTemplate>(this.base, req);
+  create(magazineId: number, req: SaveTemplateRequest): Observable<PdfmeTemplate> {
+    return this.http.post<PdfmeTemplate>(`${this.base}/magazine/${magazineId}`, req);
   }
 
   /** Clona um template existente */
-  clone(id: number): Observable<PdfmeTemplate> {
-    return this.http.post<PdfmeTemplate>(`${this.base}/${id}/clone`, {});
+  clone(magazineId: number, id: number): Observable<PdfmeTemplate> {
+    return this.http.post<PdfmeTemplate>(`${this.base}/magazine/${magazineId}/${id}/clone`, {});
   }
 
 
 
   /** Reseta o jsonSchema de volta ao template padrão do sistema de origem */
-  resetToDefault(id: number): Observable<PdfmeTemplate> {
-    return this.http.post<PdfmeTemplate>(`${this.base}/${id}/reset-to-default`, {});
+  resetToDefault(magazineId: number, id: number): Observable<PdfmeTemplate> {
+    return this.http.post<PdfmeTemplate>(`${this.base}/magazine/${magazineId}/${id}/reset-to-default`, {});
   }
 
   /** Faz o upload de um arquivo de asset (como imagem de fundo) para o disco do servidor */

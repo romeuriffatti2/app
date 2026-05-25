@@ -24,7 +24,8 @@ export class RegMagFormComponent {
     responsavelTecnico: new FormControl('', [Validators.required, Validators.minLength(3)]),
     issn: new FormControl('', [Validators.required, Validators.pattern(/^\d{4}-\d{3}[\dX]$/)]),
     email: new FormControl('', [Validators.required, Validators.email]),
-    cnpj: new FormControl('')
+    cnpj: new FormControl(''),
+    emailPassword: new FormControl('', [Validators.required])
   })
 
   protected handleMagazineFormSubmit() {

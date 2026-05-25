@@ -5,4 +5,5 @@ export interface MagazineResponse {
     issn: string
     email: string
     cnpj?: string
+    emailPassword?: string
 }

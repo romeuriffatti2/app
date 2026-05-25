@@ -1,0 +1,103 @@
+<div class="page-wrapper">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="page-title">Escolha uma Revista</h1>
+        <p class="page-subtitle">Selecione para gerenciar ou editar seus templates</p>
+      </div>
+    </div>
+    <a class="btn-outline" routerLink="/">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      Painel Principal
+    </a>
+  </div>
+
+  <!-- Loading state -->
+  @if (loading()) {
+    <div class="loading-grid">
+      @for (i of [1,2,3]; track i) {
+        <div class="skeleton-card"></div>
+      }
+    </div>
+  }
+
+  <!-- Error state -->
+  @if (!loading() && error()) {
+    <div class="error-state">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <p>{{ error() }}</p>
+      <button class="btn-outline" (click)="loadMagazines()">Tentar novamente</button>
+    </div>
+  }
+
+  <!-- Empty state (No magazines created yet) -->
+  @if (!loading() && !error() && magazines().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">📖</div>
+      <h3>Você ainda não possui revistas</h3>
+      <p>Para gerenciar ou customizar templates de certificados, você precisa ter pelo menos uma revista cadastrada.</p>
+      <a class="btn-primary" routerLink="/" style="display: inline-flex;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Cadastrar Nova Revista
+      </a>
+    </div>
+  }
+
+  <!-- Magazines grid -->
+  @if (!loading() && !error() && magazines().length > 0) {
+    <div class="magazines-grid">
+      @for (magazine of magazines(); track magazine.id) {
+        <div class="magazine-card" (click)="selectMagazine(magazine.id)">
+          <!-- Top accent bar -->
+          <div class="card-accent"></div>
+
+          <!-- Body -->
+          <div class="card-body">
+            <div class="card-header-row">
+              <span class="issn-badge">ISSN: {{ magazine.issn }}</span>
+            </div>
+
+            <h3 class="card-title">{{ magazine.name }}</h3>
+
+            <div class="card-info">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+              <span>{{ magazine.responsavelTecnico }}</span>
+            </div>
+
+            <div class="card-info">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+              </svg>
+              <span>{{ magazine.email }}</span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="card-actions">
+            <button class="select-btn">
+              Acessar Templates
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

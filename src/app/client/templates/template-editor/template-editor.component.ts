@@ -31,6 +31,7 @@ export class TemplateEditorComponent implements AfterViewInit, OnDestroy {
   private router = inject(Router);
   private templateService = inject(TemplateService);
 
+  magazineId!: number;
   templateId!: number;
   templateName = signal('');
   loading = signal(true);
@@ -41,6 +42,7 @@ export class TemplateEditorComponent implements AfterViewInit, OnDestroy {
   private designer!: Designer;
 
   ngAfterViewInit() {
+    this.magazineId = Number(this.route.snapshot.paramMap.get('magazineId'));
     this.templateId = Number(this.route.snapshot.paramMap.get('id'));
     this.loadAndInit();
   }
@@ -48,7 +50,7 @@ export class TemplateEditorComponent implements AfterViewInit, OnDestroy {
   private loadAndInit() {
     this.loading.set(true);
     this.error.set(null);
-    this.templateService.getById(this.templateId).subscribe({
+    this.templateService.getById(this.magazineId, this.templateId).subscribe({
       next: (template) => {
         this.templateName.set(template.name);
         const blankPdf = { width: 297, height: 210, padding: [0, 0, 0, 0] };
@@ -126,7 +128,7 @@ export class TemplateEditorComponent implements AfterViewInit, OnDestroy {
     }
     
     const jsonSchema = JSON.stringify(template);
-    this.templateService.save(this.templateId, {
+    this.templateService.save(this.magazineId, this.templateId, {
       name: this.templateName(),
       jsonSchema
     }).subscribe({
@@ -167,7 +169,7 @@ export class TemplateEditorComponent implements AfterViewInit, OnDestroy {
   }
 
   goBack() {
-    this.router.navigate(['/templates']);
+    this.router.navigate(['/templates/magazine', this.magazineId]);
   }
 
   ngOnDestroy() {

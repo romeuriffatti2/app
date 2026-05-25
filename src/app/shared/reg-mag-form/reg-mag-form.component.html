@@ -37,6 +37,14 @@
         <input id="cnpj" formControlName="cnpj" placeholder="00.000.000/0000-00">
     </div>
 
+    <div class="form-group">
+        <label for="emailPassword">Senha de Disparo do App Google</label>
+        <input id="emailPassword" type="password" formControlName="emailPassword" placeholder="Ex: abcd efgh ijkl mnop">
+        @if(magazineForm.get('emailPassword')?.touched && magazineForm.get('emailPassword')?.invalid){
+        <span class="error">Senha de disparo obrigatória</span>
+        }
+    </div>
+
     <app-secondary-button [text]="'Cadastrar'" [type]="'submit'"></app-secondary-button>
 
 </form>

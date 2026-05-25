@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { TemplateService } from '../../../services/template.service';
 import { PdfmeTemplate } from '../../../models/template.model';
 
@@ -14,20 +14,30 @@ import { PdfmeTemplate } from '../../../models/template.model';
 export class TemplateListComponent implements OnInit {
   private templateService = inject(TemplateService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
+  magazineId = signal<number | null>(null);
   templates = signal<PdfmeTemplate[]>([]);
   loading = signal(true);
   error = signal<string | null>(null);
   actionLoading = signal<number | null>(null); // ID do template em operação
 
   ngOnInit() {
-    this.loadTemplates();
+    this.route.paramMap.subscribe(params => {
+      const magIdStr = params.get('magazineId');
+      if (magIdStr) {
+        this.magazineId.set(Number(magIdStr));
+        this.loadTemplates();
+      }
+    });
   }
 
   loadTemplates() {
+    const magId = this.magazineId();
+    if (!magId) return;
     this.loading.set(true);
     this.error.set(null);
-    this.templateService.listMyTemplates().subscribe({
+    this.templateService.listMyTemplates(magId).subscribe({
       next: (list) => {
         this.templates.set(list);
         this.loading.set(false);
@@ -41,12 +51,14 @@ export class TemplateListComponent implements OnInit {
   }
 
   openEditor(templateId: number) {
-    this.router.navigate(['/templates/editor', templateId]);
+    this.router.navigate(['/templates/magazine', this.magazineId(), 'editor', templateId]);
   }
 
   clone(template: PdfmeTemplate) {
+    const magId = this.magazineId();
+    if (!magId) return;
     this.actionLoading.set(template.id);
-    this.templateService.clone(template.id).subscribe({
+    this.templateService.clone(magId, template.id).subscribe({
       next: (cloned) => {
         this.templates.update(list => [...list, cloned]);
         this.actionLoading.set(null);
@@ -56,9 +68,11 @@ export class TemplateListComponent implements OnInit {
   }
 
   resetToDefault(template: PdfmeTemplate) {
+    const magId = this.magazineId();
+    if (!magId) return;
     if (!confirm(`Resetar "${template.name}" para o padrão do sistema?`)) return;
     this.actionLoading.set(template.id);
-    this.templateService.resetToDefault(template.id).subscribe({
+    this.templateService.resetToDefault(magId, template.id).subscribe({
       next: (updated) => {
         this.templates.update(list =>
           list.map(t => t.id === updated.id ? updated : t)
@@ -72,10 +86,12 @@ export class TemplateListComponent implements OnInit {
 
 
   createNew() {
+    const magId = this.magazineId();
+    if (!magId) return;
     const name = prompt('Nome do novo template:');
     if (!name?.trim()) return;
     const blankSchema = JSON.stringify({ basePdf: '__BLANK_PDF__', schemas: [[]] });
-    this.templateService.create({ name: name.trim(), jsonSchema: blankSchema }).subscribe({
+    this.templateService.create(magId, { name: name.trim(), jsonSchema: blankSchema }).subscribe({
       next: (created) => {
         this.templates.update(list => [created, ...list]);
         this.openEditor(created.id);

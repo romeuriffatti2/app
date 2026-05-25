@@ -88,7 +88,15 @@ export class GenCertFormComponent implements OnInit {
   ngOnInit() {
     this.getMagazines();
     this.getPersons();
-    this.getTemplates();
+
+    this.certificadoForm.get('magazine')?.valueChanges.subscribe(magIdStr => {
+      if (magIdStr) {
+        this.getTemplatesForMagazine(Number(magIdStr));
+      } else {
+        this.templates.set([]);
+        this.certificadoForm.get('templateId')?.setValue(null);
+      }
+    });
   }
 
   private getMagazines(): void {
@@ -98,12 +106,12 @@ export class GenCertFormComponent implements OnInit {
     });
   }
 
-  private getTemplates(): void {
-    this.templateService.listMyTemplates().subscribe({
+  private getTemplatesForMagazine(magazineId: number): void {
+    this.templateService.listMyTemplates(magazineId).subscribe({
       next: (res) => {
         this.templates.set(res);
       },
-      error: () => this.toastr.error("Não foi possível carregar seus templates"),
+      error: () => this.toastr.error("Não foi possível carregar os templates da revista"),
     });
   }
 
@@ -229,7 +237,7 @@ export class GenCertFormComponent implements OnInit {
     };
 
     // 1. Usa o template selecionado que já foi carregado
-    this.templateService.getById(templateId).subscribe({
+    this.templateService.getById(request.magazineId, templateId).subscribe({
       next: async (res) => {
         try {
           if (!res.jsonSchema) {

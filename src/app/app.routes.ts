@@ -25,12 +25,19 @@ export const routes: Routes = [
       {
         path: '',
         loadComponent: () =>
+          import('./client/templates/select-magazine/select-magazine.component').then(
+            m => m.SelectMagazineComponent
+          )
+      },
+      {
+        path: 'magazine/:magazineId',
+        loadComponent: () =>
           import('./client/templates/template-list/template-list.component').then(
             m => m.TemplateListComponent
           )
       },
       {
-        path: 'editor/:id',
+        path: 'magazine/:magazineId/editor/:id',
         loadComponent: () =>
           import('./client/templates/template-editor/template-editor.component').then(
             m => m.TemplateEditorComponent
