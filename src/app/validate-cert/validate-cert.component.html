@@ -96,7 +96,7 @@
           @if (certificate().volume || certificate().number) {
           <div class="detail-row">
             <span class="label">Edição/Volume</span>
-            <span class="value">Vol. {{ certificate().volume || '-' }}, Num. {{ certificate().number || '-' }}</span>
+            <span class="value">{{ certificate().volume || '-' }}, {{ certificate().number || '-' }}</span>
           </div>
           }
 

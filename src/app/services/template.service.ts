@@ -49,4 +49,11 @@ export class TemplateService {
   resetToDefault(id: number): Observable<PdfmeTemplate> {
     return this.http.post<PdfmeTemplate>(`${this.base}/${id}/reset-to-default`, {});
   }
+
+  /** Faz o upload de um arquivo de asset (como imagem de fundo) para o disco do servidor */
+  uploadAsset(file: File): Observable<{ url: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<{ url: string }>(`${API_BASE_URL}/my/assets/image`, formData);
+  }
 }

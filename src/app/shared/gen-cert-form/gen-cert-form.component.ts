@@ -15,6 +15,7 @@ import { PdfmeTemplate } from '../../models/template.model';
 import { generate } from '@pdfme/generator';
 import { text, image, barcodes } from '@pdfme/schemas';
 import { getDefaultFont } from '@pdfme/common';
+import { API_BASE_URL } from '../../api/api';
 @Component({
   selector: 'app-gen-cert-form',
   standalone: true,
@@ -239,6 +240,12 @@ export class GenCertFormComponent implements OnInit {
           // Trata barras invertidas do JSON armazenado no banco
           console.log('JSON Schema bruto do banco:', res.jsonSchema);
           const templateJson = JSON.parse(res.jsonSchema);
+          
+          // Se basePdf for uma URL relativa do servidor, resolve para URL absoluta usando API_BASE_URL
+          if (typeof templateJson.basePdf === 'string' && templateJson.basePdf.startsWith('/uploads/')) {
+            templateJson.basePdf = `${API_BASE_URL}${templateJson.basePdf}`;
+          }
+          
           console.log('Template parseado para PDFME:', templateJson);
 
           // Pega o nome da revista

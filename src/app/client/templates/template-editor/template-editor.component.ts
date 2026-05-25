@@ -14,6 +14,7 @@ import { getDefaultFont } from '@pdfme/common';
 import { text, image } from '@pdfme/schemas';
 import { PDFDocument } from 'pdf-lib';
 import { TemplateService } from '../../../services/template.service';
+import { API_BASE_URL } from '../../../api/api';
 
 @Component({
   selector: 'app-template-editor',
@@ -66,10 +67,15 @@ export class TemplateEditorComponent implements AfterViewInit, OnDestroy {
         }
         if (!schema.schemas || !Array.isArray(schema.schemas)) schema.schemas = [[]];
         
-        // Se basePdf for uma string válida de data URI (base64 de imagem/pdf), nós a mantemos.
+        // Se basePdf for uma URL relativa do servidor, resolve para URL absoluta usando API_BASE_URL
+        if (typeof schema.basePdf === 'string' && schema.basePdf.startsWith('/uploads/')) {
+          schema.basePdf = `${API_BASE_URL}${schema.basePdf}`;
+        }
+        
+        // Se basePdf for uma string válida de data URI (base64 de imagem/pdf) ou uma URL HTTP(S), nós a mantemos.
         // Caso contrário (string vazia, objeto malformado, etc), resetamos para folha em branco.
         if (typeof schema.basePdf === 'string') {
-          if (!schema.basePdf.startsWith('data:')) {
+          if (!schema.basePdf.startsWith('data:') && !schema.basePdf.startsWith('http://') && !schema.basePdf.startsWith('https://')) {
             console.log('Migrating invalid string-based basePdf to object format');
             schema.basePdf = blankPdf;
           }
@@ -111,7 +117,15 @@ export class TemplateEditorComponent implements AfterViewInit, OnDestroy {
     if (!this.designer) return;
     this.saving.set(true);
     this.saveSuccess.set(false);
-    const jsonSchema = JSON.stringify(this.designer.getTemplate());
+    
+    const template = this.designer.getTemplate();
+    // Se o basePdf for uma URL absoluta resolvida pelo frontend, converte de volta para relativa antes de persistir
+    if (typeof template.basePdf === 'string' && template.basePdf.includes('/uploads/')) {
+      const index = template.basePdf.indexOf('/uploads/');
+      template.basePdf = template.basePdf.substring(index);
+    }
+    
+    const jsonSchema = JSON.stringify(template);
     this.templateService.save(this.templateId, {
       name: this.templateName(),
       jsonSchema
@@ -128,46 +142,28 @@ export class TemplateEditorComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  async uploadBackground(event: Event) {
+  uploadBackground(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file || !this.designer) return;
 
     this.loading.set(true);
-    try {
-      const arrayBuffer = await file.arrayBuffer();
-      const pdfDoc = await PDFDocument.create();
-      
-      // A4 landscape dimensions em pontos (297x210 mm)
-      const page = pdfDoc.addPage([841.89, 595.28]);
-
-      let imageToEmbed;
-      if (file.type === 'image/png') {
-        imageToEmbed = await pdfDoc.embedPng(arrayBuffer);
-      } else if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
-        imageToEmbed = await pdfDoc.embedJpg(arrayBuffer);
-      } else {
-        throw new Error('Formato não suportado. Use PNG ou JPG.');
+    this.templateService.uploadAsset(file).subscribe({
+      next: (res) => {
+        const template = this.designer.getTemplate();
+        // Define a URL absoluta para renderização em tempo real no editor
+        template.basePdf = `${API_BASE_URL}${res.url}`;
+        this.designer.updateTemplate(template);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Erro ao fazer upload da imagem de fundo:', err);
+        this.error.set('Erro ao fazer upload da imagem de fundo. Use formato PNG ou JPG (máx 5MB).');
+        this.loading.set(false);
+      },
+      complete: () => {
+        (event.target as HTMLInputElement).value = '';
       }
-
-      page.drawImage(imageToEmbed, {
-        x: 0,
-        y: 0,
-        width: 841.89,
-        height: 595.28,
-      });
-
-      const pdfBytes = await pdfDoc.saveAsBase64({ dataUri: true });
-
-      const template = this.designer.getTemplate();
-      template.basePdf = pdfBytes;
-      this.designer.updateTemplate(template);
-    } catch (e) {
-      console.error('Erro ao processar imagem de fundo:', e);
-      this.error.set('Erro ao processar imagem de fundo. Use formato PNG ou JPG.');
-    } finally {
-      this.loading.set(false);
-      (event.target as HTMLInputElement).value = '';
-    }
+    });
   }
 
   goBack() {
