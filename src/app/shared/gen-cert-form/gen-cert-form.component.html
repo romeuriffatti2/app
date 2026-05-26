@@ -21,22 +21,6 @@
     </div>
 
     <div class="form-group">
-        <label>Template do Certificado</label>
-        <select formControlName="templateId">
-            <option [ngValue]="null">Selecione</option>
-            @for (template of templates(); track template.id) {
-                <option [ngValue]="template.id">{{ template.name }}</option>
-            }
-        </select>
-
-        @if (getErrorMessage('templateId')) {
-        <span class="error">
-            {{ getErrorMessage('templateId') }}
-        </span>
-        }
-    </div>
-
-    <div class="form-group">
         <label>Revista</label>
         <select formControlName="magazine">
             <option value="">Selecione</option>
@@ -51,6 +35,22 @@
         @if (getErrorMessage('magazine')) {
         <span class="error">
             {{ getErrorMessage('magazine') }}
+        </span>
+        }
+    </div>
+
+    <div class="form-group">
+        <label>Template do Certificado</label>
+        <select formControlName="templateId">
+            <option [ngValue]="null">Selecione</option>
+            @for (template of templates(); track template.id) {
+            <option [ngValue]="template.id">{{ template.name }}</option>
+            }
+        </select>
+
+        @if (getErrorMessage('templateId')) {
+        <span class="error">
+            {{ getErrorMessage('templateId') }}
         </span>
         }
     </div>

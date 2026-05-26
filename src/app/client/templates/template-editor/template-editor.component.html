@@ -16,15 +16,47 @@
     </div>
 
     <div class="toolbar-right">
+      <!-- Remove Background (visible only when there is a background) -->
+      @if (hasBackground()) {
+        <button class="btn-remove-bg" (click)="removeBackground()" title="Remover imagem de fundo">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+          </svg>
+          Remover Fundo
+        </button>
+      }
+
       <!-- Upload Background -->
-      <label class="btn-upload" title="Escolher imagem de fundo (PNG/JPG)">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
-          <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
-        </svg>
-        Imagem de Fundo
-        <input type="file" accept="image/png,image/jpeg" (change)="uploadBackground($event)" hidden />
-      </label>
+      <div class="upload-wrapper">
+        <label class="btn-upload" title="Escolher imagem de fundo (PNG/JPG/WebP)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
+            <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+          </svg>
+          Imagem de Fundo
+          <input type="file" accept="image/png,image/jpeg,image/webp" (change)="uploadBackground($event)" hidden />
+        </label>
+        <!-- Info tooltip -->
+        <div class="upload-tooltip">
+          <div class="tooltip-row">
+            <span class="tooltip-icon">✅</span>
+            <span><strong>Formatos:</strong> PNG, JPG ou WebP</span>
+          </div>
+          <div class="tooltip-row">
+            <span class="tooltip-icon">📐</span>
+            <span><strong>Dimensões:</strong> 1754 × 1240 px (A4 paisagem, 150 DPI)</span>
+          </div>
+          <div class="tooltip-row">
+            <span class="tooltip-icon">📦</span>
+            <span><strong>Tamanho máximo:</strong> 2 MB</span>
+          </div>
+          <div class="tooltip-divider"></div>
+          <div class="tooltip-row tooltip-tip">
+            <span class="tooltip-icon">💡</span>
+            <span>Comprima sem perda de qualidade com <strong>TinyPNG</strong> ou <strong>Squoosh</strong></span>
+          </div>
+        </div>
+      </div>
 
       <!-- Save -->
       <button class="btn-save" (click)="save()" [disabled]="saving()">
@@ -78,4 +110,46 @@
 
   <!-- PDFME Designer container -->
   <div class="designer-host" #designerContainer [hidden]="loading() || error()"></div>
+
 </div>
+
+<!-- Modal: Alterações não salvas -->
+@if (showUnsavedModal()) {
+  <div class="modal-overlay" (click)="cancelModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-icon-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+      <h3 class="modal-title">Alterações não salvas</h3>
+      <p class="modal-message">
+        Você fez alterações neste template que ainda não foram salvas. O que deseja fazer?
+      </p>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-discard" (click)="confirmDiscard()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+          Descartar e Voltar
+        </button>
+        <button class="modal-btn modal-btn-save" (click)="confirmSaveAndLeave()" [disabled]="saving()">
+          @if (saving()) {
+            <div class="btn-spinner"></div>
+            Salvando...
+          } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+              <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+            </svg>
+            Salvar e Voltar
+          }
+        </button>
+        <button class="modal-btn modal-btn-cancel" (click)="cancelModal()">
+          Continuar Editando
+        </button>
+      </div>
+    </div>
+  </div>
+}

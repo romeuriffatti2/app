@@ -11,7 +11,7 @@ export class TemplateService {
 
   private readonly base = `${API_BASE_URL}/my/templates`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /** Lista todos os templates da revista */
   listMyTemplates(magazineId: number): Observable<PdfmeTemplate[]> {
@@ -42,8 +42,6 @@ export class TemplateService {
   clone(magazineId: number, id: number): Observable<PdfmeTemplate> {
     return this.http.post<PdfmeTemplate>(`${this.base}/magazine/${magazineId}/${id}/clone`, {});
   }
-
-
 
   /** Reseta o jsonSchema de volta ao template padrão do sistema de origem */
   resetToDefault(magazineId: number, id: number): Observable<PdfmeTemplate> {
