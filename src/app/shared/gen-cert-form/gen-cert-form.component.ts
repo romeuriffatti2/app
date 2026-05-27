@@ -16,6 +16,13 @@ import { generate } from '@pdfme/generator';
 import { text, image, barcodes } from '@pdfme/schemas';
 import { getDefaultFont } from '@pdfme/common';
 import { API_BASE_URL } from '../../api/api';
+import { PDFDocument } from 'pdf-lib';
+
+/** Host do servidor sem o prefixo /api — usado para acessar assets em /uploads/** */
+const SERVER_BASE_URL = API_BASE_URL.replace(/\/api$/, '');
+
+/** Dimensões do A4 em pontos (1pt = 25.4mm/72) para o PDF de background */
+const A4_LANDSCAPE_PT = { width: 841.89, height: 595.28 } as const;
 @Component({
   selector: 'app-gen-cert-form',
   standalone: true,
@@ -249,9 +256,16 @@ export class GenCertFormComponent implements OnInit {
           console.log('JSON Schema bruto do banco:', res.jsonSchema);
           const templateJson = JSON.parse(res.jsonSchema);
           
-          // Se basePdf for uma URL relativa do servidor, resolve para URL absoluta usando API_BASE_URL
+          // Se basePdf for uma URL relativa do servidor, resolve para o formato PDF Data URI em memória usando a biblioteca pdf-lib
           if (typeof templateJson.basePdf === 'string' && templateJson.basePdf.startsWith('/uploads/')) {
-            templateJson.basePdf = `${API_BASE_URL}${templateJson.basePdf}`;
+            const absoluteImageUrl = `${SERVER_BASE_URL}${templateJson.basePdf}`;
+            try {
+              templateJson.basePdf = await this.imageUrlToPdfDataUri(absoluteImageUrl);
+            } catch (err) {
+              console.error("Erro ao converter imagem de fundo do template:", err);
+              // Fallback
+              templateJson.basePdf = absoluteImageUrl;
+            }
           }
           
           console.log('Template parseado para PDFME:', templateJson);
@@ -370,5 +384,71 @@ export class GenCertFormComponent implements OnInit {
       binary += String.fromCharCode(bytes[i]);
     }
     return window.btoa(binary);
+  }
+
+  /**
+   * Converte uma imagem de uma URL pública para data:application/pdf;base64,...
+   */
+  private async imageUrlToPdfDataUri(url: string): Promise<string> {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP ${response.status} ao buscar imagem`);
+    const buffer = await response.arrayBuffer();
+    const contentType = response.headers.get('content-type') ?? 'image/jpeg';
+    return this.imageBufferToPdfDataUri(buffer, contentType);
+  }
+
+  /**
+   * Empacota bytes de uma imagem PNG ou JPEG em um PDF A4 paisagem usando pdf-lib.
+   * Retorna data:application/pdf;base64,... — formato exigido pelo PDFME.
+   */
+  private async imageBufferToPdfDataUri(buffer: ArrayBuffer, mimeType: string): Promise<string> {
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([A4_LANDSCAPE_PT.width, A4_LANDSCAPE_PT.height]);
+
+    let embeddedImage;
+    if (mimeType.includes('png')) {
+      embeddedImage = await pdfDoc.embedPng(buffer);
+    } else {
+      try {
+        embeddedImage = await pdfDoc.embedJpg(buffer);
+      } catch {
+        embeddedImage = await pdfDoc.embedJpg(await this.toJpegViaCanvas(buffer, mimeType));
+      }
+    }
+
+    page.drawImage(embeddedImage, {
+      x: 0, y: 0,
+      width: A4_LANDSCAPE_PT.width,
+      height: A4_LANDSCAPE_PT.height
+    });
+
+    const pdfBytes = await pdfDoc.save();
+    const b64 = btoa(Array.from(new Uint8Array(pdfBytes), b => String.fromCharCode(b)).join(''));
+    return `data:application/pdf;base64,${b64}`;
+  }
+
+  /**
+   * Converte qualquer formato de imagem (incluindo WebP) para JPEG via Canvas API.
+   * Usado como fallback quando pdf-lib não suporta o formato diretamente.
+   */
+  private toJpegViaCanvas(buffer: ArrayBuffer, mimeType: string): Promise<ArrayBuffer> {
+    return new Promise((resolve, reject) => {
+      const blob = new Blob([buffer], { type: mimeType });
+      const objectUrl = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        canvas.getContext('2d')!.drawImage(img, 0, 0);
+        URL.revokeObjectURL(objectUrl);
+        canvas.toBlob(
+          blob => blob ? blob.arrayBuffer().then(resolve).catch(reject) : reject(new Error('Canvas toBlob falhou')),
+          'image/jpeg', 0.92
+        );
+      };
+      img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error('Falha ao carregar imagem no Canvas')); };
+      img.src = objectUrl;
+    });
   }
 }
