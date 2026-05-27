@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
-import { SecondaryButtonComponent } from "../../secondary-button/secondary-button.component";
+import { SecondaryButtonComponent } from "../../buttons/secondary-button/secondary-button.component";
 import { MagazineService } from '../../../services/magazine-service.service';
 import { CertificateService } from '../../../services/certificate.service';
 import { MagazineResponse } from '../../../models/magazine-response.interface';

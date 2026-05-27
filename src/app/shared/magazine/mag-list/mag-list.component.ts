@@ -1,8 +1,8 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MagazineService } from '../../services/magazine-service.service';
-import { MagazineResponse } from '../../models/magazine-response.interface';
-import { MagListItemComponent } from '../magazine/mag-list-item/mag-list-item.component';
+import { MagazineService } from '../../../services/magazine-service.service';
+import { MagazineResponse } from '../../../models/magazine-response.interface';
+import { MagListItemComponent } from '../mag-list-item/mag-list-item.component';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({

@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CertificateResponse, CertificateService, Page } from '../../services/certificate.service';
+import { CertificateResponse, CertificateService, Page } from '../../../services/certificate.service';
 
 @Component({
   selector: 'app-cert-list',
@@ -11,7 +11,7 @@ import { CertificateResponse, CertificateService, Page } from '../../services/ce
 })
 export class CertListComponent implements OnInit {
   private certService = inject(CertificateService);
-  
+
   protected certificates = signal<CertificateResponse[]>([]);
   protected page = signal<number>(0);
   protected totalPages = signal<number>(0);
@@ -61,7 +61,7 @@ export class CertListComponent implements OnInit {
 
   onResendEmail(cert: CertificateResponse) {
     if (!confirm(`Deseja reenviar o certificado para ${cert.name}?`)) return;
-    
+
     this.isActionLoading.set(true);
     this.certService.resendCertificate(cert.validationCode).subscribe({
       next: () => {

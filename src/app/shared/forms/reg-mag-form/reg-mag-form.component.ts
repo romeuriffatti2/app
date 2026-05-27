@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { SecondaryButtonComponent } from "../secondary-button/secondary-button.component";
-import { MagazineService } from '../../services/magazine-service.service';
-import { MagazineRequest } from '../../models/magazine-request.interface';
+import { SecondaryButtonComponent } from "../../buttons/secondary-button/secondary-button.component";
+import { MagazineService } from '../../../services/magazine-service.service';
+import { MagazineRequest } from '../../../models/magazine-request.interface';
 import { ToastrService } from 'ngx-toastr';
-import { MagazineResponse } from '../../models/magazine-response.interface';
+import { MagazineResponse } from '../../../models/magazine-response.interface';
 
 @Component({
   selector: 'app-reg-mag-form',

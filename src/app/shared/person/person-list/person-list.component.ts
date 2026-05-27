@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PersonService } from '../../services/person.service';
-import { PersonResponse } from '../../models/person.interface';
+import { PersonService } from '../../../services/person.service';
+import { PersonResponse } from '../../../models/person.interface';
 import { PersonListItemComponent } from '../person-list-item/person-list-item.component';
 import { ToastrService } from 'ngx-toastr';
 

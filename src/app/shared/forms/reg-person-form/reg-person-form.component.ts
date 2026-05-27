@@ -3,9 +3,9 @@ import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { ToastrService } from 'ngx-toastr';
-import { SecondaryButtonComponent } from '../secondary-button/secondary-button.component';
-import { PersonService } from '../../services/person.service';
-import { PersonRequest } from '../../models/person.interface';
+import { SecondaryButtonComponent } from '../../buttons/secondary-button/secondary-button.component';
+import { PersonService } from '../../../services/person.service';
+import { PersonRequest } from '../../../models/person.interface';
 
 @Component({
   selector: 'app-reg-person-form',
