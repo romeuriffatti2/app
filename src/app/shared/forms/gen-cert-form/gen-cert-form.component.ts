@@ -1,21 +1,21 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
-import { SecondaryButtonComponent } from "../secondary-button/secondary-button.component";
-import { MagazineService } from '../../services/magazine-service.service';
-import { CertificateService } from '../../services/certificate.service';
-import { MagazineResponse } from '../../models/magazine-response.interface';
+import { SecondaryButtonComponent } from "../../secondary-button/secondary-button.component";
+import { MagazineService } from '../../../services/magazine-service.service';
+import { CertificateService } from '../../../services/certificate.service';
+import { MagazineResponse } from '../../../models/magazine-response.interface';
 import { ToastrService } from 'ngx-toastr';
-import { CertificateItemRequest, CertificateRequest } from '../../models/certificate-request.interface';
+import { CertificateItemRequest, CertificateRequest } from '../../../models/certificate-request.interface';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
-import { PersonService } from '../../services/person.service';
-import { PersonResponse } from '../../models/person.interface';
-import { TemplateService } from '../../services/template.service';
-import { PdfmeTemplate } from '../../models/template.model';
+import { PersonService } from '../../../services/person.service';
+import { PersonResponse } from '../../../models/person.interface';
+import { TemplateService } from '../../../services/template.service';
+import { PdfmeTemplate } from '../../../models/template.model';
 import { generate } from '@pdfme/generator';
 import { text, image, barcodes } from '@pdfme/schemas';
 import { getDefaultFont } from '@pdfme/common';
-import { API_BASE_URL } from '../../api/api';
+import { API_BASE_URL } from '../../../api/api';
 import { PDFDocument } from 'pdf-lib';
 
 /** Host do servidor sem o prefixo /api — usado para acessar assets em /uploads/** */
@@ -54,7 +54,7 @@ export class GenCertFormComponent implements OnInit {
   protected filteredPersons = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
     if (!query) return [];
-    return this.allPersons().filter(p => 
+    return this.allPersons().filter(p =>
       p.name.toLowerCase().includes(query) || p.cpf.includes(query)
     );
   });
@@ -164,7 +164,7 @@ export class GenCertFormComponent implements OnInit {
   }
 
   protected addManualName(event?: Event): void {
-    event?.preventDefault(); 
+    event?.preventDefault();
     event?.stopPropagation();
 
     const nameControl = this.certificadoForm.get('manualName');
@@ -255,7 +255,7 @@ export class GenCertFormComponent implements OnInit {
           // Trata barras invertidas do JSON armazenado no banco
           console.log('JSON Schema bruto do banco:', res.jsonSchema);
           const templateJson = JSON.parse(res.jsonSchema);
-          
+
           // Se basePdf for uma URL relativa do servidor, resolve para o formato PDF Data URI em memória usando a biblioteca pdf-lib
           if (typeof templateJson.basePdf === 'string' && templateJson.basePdf.startsWith('/uploads/')) {
             const absoluteImageUrl = `${SERVER_BASE_URL}${templateJson.basePdf}`;
@@ -267,7 +267,7 @@ export class GenCertFormComponent implements OnInit {
               templateJson.basePdf = absoluteImageUrl;
             }
           }
-          
+
           console.log('Template parseado para PDFME:', templateJson);
 
           // Pega o nome da revista
@@ -308,7 +308,7 @@ export class GenCertFormComponent implements OnInit {
             };
 
             const interpolatedInput: Record<string, string> = {};
-            
+
             // Para cada campo definido no schema, nós pegamos o 'content' padrão
             // e substituímos as tags {{variavel}} pelo valor correspondente em rawData
             pageSchemas.forEach((schemaField: any) => {
@@ -337,7 +337,7 @@ export class GenCertFormComponent implements OnInit {
 
           // 2. Gera o PDF mesclado para download do usuário
           const pdfMerged = await generate({ template: templateJson, plugins, inputs, options });
-          
+
           // Dispara download do arquivo único (com várias páginas) imediatamente antes da req assíncrona
           const blob = new Blob([pdfMerged], { type: 'application/pdf' });
           const url = window.URL.createObjectURL(blob);
