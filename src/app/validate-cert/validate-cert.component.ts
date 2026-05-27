@@ -3,6 +3,7 @@ import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angula
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { API_BASE_URL } from '../api/api';
+import { ValidationService } from '../services/validation.service';
 
 type SearchMode = 'code' | 'email';
 
@@ -14,29 +15,21 @@ type SearchMode = 'code' | 'email';
   styleUrl: './validate-cert.component.css'
 })
 export class ValidateCertComponent {
-
+  private validationService = inject(ValidationService);
   private http = inject(HttpClient);
-
-  // ── Modo de busca ──────────────────────────────────────────────────────────
   protected searchMode = signal<SearchMode>('code');
-
-  // ── Estado: busca por código ───────────────────────────────────────────────
   protected loading = signal<boolean>(false);
   protected error = signal<string>('');
   protected certificate = signal<any>(null);
+  protected emailLoading = signal<boolean>(false);
+  protected emailSent = signal<boolean>(false);
+  protected emailError = signal<string>('');
+  protected showConfirmModal = signal<boolean>(false);
+  protected showRateLimitModal = signal<boolean>(false);
 
   validationForm = new FormGroup({
     validationCode: new FormControl('', { nonNullable: true, validators: [Validators.required] })
   });
-
-  // ── Estado: receber por e-mail ─────────────────────────────────────────────
-  protected emailLoading = signal<boolean>(false);
-  protected emailSent = signal<boolean>(false);
-  protected emailError = signal<string>('');
-
-  // Modais
-  protected showConfirmModal = signal<boolean>(false);
-  protected showRateLimitModal = signal<boolean>(false);
 
   emailForm = new FormGroup({
     email: new FormControl('', {
@@ -45,8 +38,7 @@ export class ValidateCertComponent {
     })
   });
 
-  // ── Alternância de modo ────────────────────────────────────────────────────
-  setMode(mode: SearchMode): void {
+  protected setMode(mode: SearchMode): void {
     this.searchMode.set(mode);
     this.error.set('');
     this.certificate.set(null);
@@ -56,8 +48,7 @@ export class ValidateCertComponent {
     this.showRateLimitModal.set(false);
   }
 
-  // ── Validação por código ───────────────────────────────────────────────────
-  onValidate(): void {
+  protected onValidate(): void {
     const code = this.validationForm.controls.validationCode.value;
     if (this.validationForm.invalid || !code.trim()) return;
 
@@ -65,7 +56,7 @@ export class ValidateCertComponent {
     this.error.set('');
     this.certificate.set(null);
 
-    this.http.get<any>(`${API_BASE_URL}/certificate/validate/${code.trim()}`).subscribe({
+    this.validationService.validateCertificateByCode(code).subscribe({
       next: (data) => {
         this.certificate.set(data);
         this.loading.set(false);
@@ -77,29 +68,25 @@ export class ValidateCertComponent {
     });
   }
 
-  onDownload(uuid: string): void {
+  protected onDownload(uuid: string): void {
     window.open(`${API_BASE_URL}/certificate/download/${uuid}`, '_blank');
   }
 
-  // ── Receber por e-mail ─────────────────────────────────────────────────────
-
-  /** Abre o modal de confirmação antes de enviar */
-  onRequestSend(): void {
+  protected onRequestSend(): void {
     if (this.emailForm.invalid) return;
     this.showConfirmModal.set(true);
   }
 
-  /** Usuário confirmou: fecha o modal e dispara o envio */
-  onConfirmSend(): void {
+  protected onConfirmSend(): void {
     this.showConfirmModal.set(false);
     this.executeSend();
   }
 
-  closeConfirmModal(): void {
+  protected closeConfirmModal(): void {
     this.showConfirmModal.set(false);
   }
 
-  closeRateLimitModal(): void {
+  protected closeRateLimitModal(): void {
     this.showRateLimitModal.set(false);
   }
 
@@ -110,11 +97,7 @@ export class ValidateCertComponent {
     this.emailSent.set(false);
     this.emailError.set('');
 
-    this.http.post<void>(
-      `${API_BASE_URL}/certificate/send-by-email`,
-      null,
-      { params: { email } }
-    ).subscribe({
+    this.validationService.sendByEmail(email).subscribe({
       next: () => {
         this.emailLoading.set(false);
         this.emailSent.set(true);
