@@ -10,6 +10,7 @@ export interface CertificateRequest {
 
 export interface CertificateItemRequest {
     name: string;
+    cpf?: string;
     email?: string;
     personId?: number;
     validationCode: string;

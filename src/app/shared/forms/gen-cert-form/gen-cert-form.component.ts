@@ -199,6 +199,7 @@ export class GenCertFormComponent implements OnInit {
 
     const newItem: CertificateItemRequest = {
       name,
+      cpf: cpf || undefined,
       email: email || undefined,
       personId: personId || undefined,
       validationCode: crypto.randomUUID(),

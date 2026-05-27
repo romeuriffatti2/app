@@ -24,6 +24,34 @@
       </p>
     </div>
 
+    <!-- Toggle de modo -->
+    <div class="search-mode-toggle">
+      <button
+        id="btn-mode-code"
+        class="toggle-btn"
+        [class.active]="searchMode() === 'code'"
+        (click)="setMode('code')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Validar por Código
+      </button>
+      <button
+        id="btn-mode-email"
+        class="toggle-btn"
+        [class.active]="searchMode() === 'email'"
+        (click)="setMode('email')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 8L10.8906 13.2604C11.5624 13.7083 12.4376 13.7083 13.1094 13.2604L21 8M5 19H19C20.1046 19 21 18.1046 21 17V7C21 5.89543 20.1046 5 19 5H5C3.89543 5 3 5.89543 3 7V17C3 18.1046 3.89543 19 5 19Z"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Receber por E-mail
+      </button>
+    </div>
+
+    <!-- Card: Validar por Código -->
+    @if (searchMode() === 'code') {
     <div class="validation-card">
       <div class="card-header">
         <h2>Validar Certificado</h2>
@@ -119,6 +147,77 @@
       </div>
       }
     </div>
+    }
+
+    <!-- Card: Receber por E-mail -->
+    @if (searchMode() === 'email') {
+    <div class="validation-card email-card">
+      <div class="card-header">
+        <div class="card-header-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 8L10.8906 13.2604C11.5624 13.7083 12.4376 13.7083 13.1094 13.2604L21 8M5 19H19C20.1046 19 21 18.1046 21 17V7C21 5.89543 20.1046 5 19 5H5C3.89543 5 3 5.89543 3 7V17C3 18.1046 3.89543 19 5 19Z"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <h2>Receba seus Certificados</h2>
+          <p>Informe o e-mail cadastrado na plataforma. Se existirem certificados vinculados a ele, você os receberá em breve.</p>
+        </div>
+      </div>
+
+      @if (!emailSent()) {
+      <form [formGroup]="emailForm" (ngSubmit)="onRequestSend()" class="form-group">
+        <label for="recipientEmail">Endereço de E-mail</label>
+        <div class="input-group">
+          <input
+            type="email"
+            id="recipientEmail"
+            formControlName="email"
+            placeholder="seu@email.com"
+            [class.input-invalid]="emailForm.controls.email.invalid && emailForm.controls.email.touched">
+          <button type="submit" class="btn-validate" [disabled]="emailLoading() || emailForm.invalid">
+            @if (emailLoading()) {
+            <span class="spinner"></span> Enviando...
+            } @else {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Receber
+            }
+          </button>
+        </div>
+        @if (emailForm.controls.email.invalid && emailForm.controls.email.touched) {
+        <span class="field-error">Insira um endereço de e-mail válido.</span>
+        }
+      </form>
+
+      @if (emailError()) {
+      <div class="alert alert-error">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 8V12M12 16H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        {{ emailError() }}
+      </div>
+      }
+      }
+
+      @if (emailSent()) {
+      <div class="alert alert-success">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <strong>Solicitação enviada!</strong>
+          <p>Se existirem certificados vinculados ao e-mail informado, eles serão enviados em breve. Verifique sua caixa de entrada e a pasta de spam.</p>
+        </div>
+      </div>
+      <button class="btn-new-search" (click)="emailSent.set(false)">Fazer nova consulta</button>
+      }
+    </div>
+    }
   </main>
 
   <!-- Footer -->
@@ -135,3 +234,50 @@
     </div>
   </footer>
 </div>
+
+<!-- Modal: Confirmação de e-mail -->
+@if (showConfirmModal()) {
+<div class="modal-overlay" (click)="closeConfirmModal()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <div class="modal-icon modal-icon--info">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 8L10.8906 13.2604C11.5624 13.7083 12.4376 13.7083 13.1094 13.2604L21 8M5 19H19C20.1046 19 21 18.1046 21 17V7C21 5.89543 20.1046 5 19 5H5C3.89543 5 3 5.89543 3 7V17C3 18.1046 3.89543 19 5 19Z"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h3>Confirme seu e-mail</h3>
+    <p>Os certificados serão enviados para:</p>
+    <div class="modal-email-display">{{ emailForm.controls.email.value }}</div>
+    <p class="modal-hint">Verifique se o endereço está correto antes de continuar.</p>
+    <div class="modal-actions">
+      <button class="btn-modal-secondary" (click)="closeConfirmModal()">Corrigir</button>
+      <button class="btn-modal-primary" (click)="onConfirmSend()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Confirmar e Enviar
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Modal: Rate limit atingido -->
+@if (showRateLimitModal()) {
+<div class="modal-overlay" (click)="closeRateLimitModal()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <div class="modal-icon modal-icon--warn">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 9V13M12 17H12.01M10.29 3.86L1.82 18C1.64 18.31 1.55 18.66 1.55 19.01C1.55 20.11 2.45 21 3.55 21H20.45C21.55 21 22.45 20.11 22.45 19.01C22.45 18.66 22.36 18.31 22.18 18L13.71 3.86C13.52 3.54 13.16 3.34 12.77 3.34C12.38 3.34 12.02 3.54 11.83 3.86H10.29Z"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h3>Muitas tentativas</h3>
+    <p>Você atingiu o limite de solicitações. Por segurança, aguarde alguns minutos antes de tentar novamente.</p>
+    <div class="modal-actions modal-actions--center">
+      <button class="btn-modal-primary" (click)="closeRateLimitModal()">Entendi</button>
+    </div>
+  </div>
+</div>
+}

@@ -13,8 +13,9 @@
   font-family: var(--primary-font), sans-serif;
 }
 
+/* ── Navbar ─────────────────────────────────────────── */
 .cert-navbar {
-  background-color: #1E293B; /* Specific navy shade */
+  background-color: #1E293B;
   padding: 1rem 2rem;
   border-bottom: 1px solid #334155;
   display: flex;
@@ -25,12 +26,13 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: #38BDF8; /* Sky blue */
+  color: #38BDF8;
   font-weight: 700;
   font-size: 1.25rem;
   letter-spacing: 1px;
 }
 
+/* ── Main ───────────────────────────────────────────── */
 .main-content {
   flex: 1;
   display: flex;
@@ -42,7 +44,7 @@
 .hero-section {
   text-align: center;
   max-width: 600px;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
 }
 
 .hero-section h1 {
@@ -59,6 +61,46 @@
   line-height: 1.6;
 }
 
+/* ── Toggle de modo ─────────────────────────────────── */
+.search-mode-toggle {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1.5rem;
+  background-color: #0F172A;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 4px;
+}
+
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: transparent;
+  border: none;
+  border-radius: 7px;
+  color: #64748B;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.toggle-btn:hover:not(.active) {
+  color: #CBD5E1;
+  background-color: rgba(255,255,255,0.04);
+}
+
+.toggle-btn.active {
+  background-color: #1E293B;
+  color: #38BDF8;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+
+/* ── Card ───────────────────────────────────────────── */
 .validation-card {
   background-color: #1E293B;
   border: 1px solid #334155;
@@ -67,10 +109,25 @@
   width: 100%;
   max-width: 650px;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  animation: slideIn 0.25s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .card-header {
   margin-bottom: 2rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.card-header-icon {
+  flex-shrink: 0;
+  color: #38BDF8;
+  margin-top: 2px;
 }
 
 .card-header h2 {
@@ -82,8 +139,10 @@
 .card-header p {
   color: #94A3B8;
   font-size: 0.95rem;
+  margin: 0;
 }
 
+/* ── Formulário ─────────────────────────────────────── */
 .form-group label {
   display: block;
   font-weight: 600;
@@ -114,6 +173,17 @@
   box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
 }
 
+.input-group input.input-invalid {
+  border-color: #EF4444;
+}
+
+.field-error {
+  display: block;
+  margin-top: 0.5rem;
+  color: #FCA5A5;
+  font-size: 0.85rem;
+}
+
 .btn-validate {
   display: flex;
   align-items: center;
@@ -128,6 +198,7 @@
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.2s;
+  white-space: nowrap;
 }
 
 .btn-validate:hover:not([disabled]) {
@@ -139,6 +210,7 @@
   cursor: not-allowed;
 }
 
+/* ── Spinner ────────────────────────────────────────── */
 .spinner {
   width: 16px;
   height: 16px;
@@ -150,19 +222,72 @@
 
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-.alert-error {
+/* ── Alerts ─────────────────────────────────────────── */
+.alert {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.75rem;
   margin-top: 1.5rem;
-  padding: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.alert-error {
   background-color: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.2);
   color: #FCA5A5;
-  border-radius: 6px;
-  font-size: 0.95rem;
 }
 
+.alert-success {
+  background-color: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #6EE7B7;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.alert-success svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.alert-success strong {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
+  color: #34D399;
+}
+
+.alert-success p {
+  margin: 0;
+  color: #94A3B8;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.btn-new-search {
+  margin-top: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.2rem;
+  background: transparent;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  color: #94A3B8;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-new-search:hover {
+  border-color: #475569;
+  color: #E2E8F0;
+}
+
+/* ── Resultado de validação por código ──────────────── */
 .success-result {
   margin-top: 2rem;
   padding-top: 2rem;
@@ -172,7 +297,7 @@
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .success-header {
@@ -184,7 +309,7 @@
 
 .success-header h3 {
   font-size: 1.25rem;
-  color: #34D399; /* Emerald 400 */
+  color: #34D399;
   margin: 0;
 }
 
@@ -265,6 +390,7 @@
   background-color: #059669;
 }
 
+/* ── Footer ─────────────────────────────────────────── */
 .cert-footer {
   background-color: var(--bg-color);
   border-top: 1px solid #1E293B;
@@ -300,7 +426,148 @@
   color: #475569;
 }
 
+/* ── Modais ─────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(2, 6, 23, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: overlayIn 0.2s ease-out;
+}
+
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal-box {
+  background-color: #1E293B;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 2.5rem;
+  max-width: 420px;
+  width: calc(100% - 3rem);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+  text-align: center;
+  animation: modalIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.9) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.modal-icon--info {
+  background-color: rgba(56, 189, 248, 0.12);
+  color: #38BDF8;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+}
+
+.modal-icon--warn {
+  background-color: rgba(245, 158, 11, 0.12);
+  color: #FCD34D;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.modal-box h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.75rem;
+}
+
+.modal-box p {
+  color: #94A3B8;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  margin-bottom: 0.5rem;
+}
+
+.modal-email-display {
+  background-color: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-family: monospace;
+  font-size: 1rem;
+  color: #38BDF8;
+  margin: 1rem 0 0.75rem;
+  word-break: break-all;
+}
+
+.modal-hint {
+  font-size: 0.85rem !important;
+  color: #64748B !important;
+  margin-bottom: 1.75rem !important;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+
+.modal-actions--center {
+  justify-content: center;
+}
+
+.btn-modal-secondary {
+  flex: 1;
+  padding: 0.75rem;
+  background: transparent;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  color: #94A3B8;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-modal-secondary:hover {
+  border-color: #64748B;
+  color: #E2E8F0;
+}
+
+.btn-modal-primary {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background-color: var(--blue-secondary);
+  border: none;
+  border-radius: 8px;
+  color: #FFF;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-modal-primary:hover {
+  background-color: #1D4ED8;
+}
+
+/* ── Responsivo ─────────────────────────────────────── */
 @media (max-width: 640px) {
   .input-group { flex-direction: column; }
   .btn-validate { padding: 0.875rem; }
+  .search-mode-toggle { width: 100%; max-width: 650px; }
+  .toggle-btn { flex: 1; justify-content: center; font-size: 0.82rem; }
 }
