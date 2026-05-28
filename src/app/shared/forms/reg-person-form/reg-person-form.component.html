@@ -31,3 +31,52 @@
     <app-secondary-button [text]="'Registrar'" [type]="'submit'"></app-secondary-button>
 
 </form>
+
+<!-- ===== Modal de Reativação ===== -->
+@if (showReactivateModal()) {
+  <div class="reactivate-overlay" (click)="closeReactivateModal()">
+    <div class="reactivate-card" (click)="$event.stopPropagation()">
+
+      <div class="reactivate-card__icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/>
+          <path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>
+        </svg>
+      </div>
+
+      <h3 class="reactivate-card__title">Cadastro Encontrado</h3>
+
+      <p class="reactivate-card__text">
+        O CPF informado pertence ao cadastro de
+        <strong>{{ deletedPersonName() }}</strong>,
+        que foi excluído anteriormente do sistema.
+      </p>
+
+      <p class="reactivate-card__sub">
+        Deseja reativar este cadastro com os dados informados no formulário?
+      </p>
+
+      <div class="reactivate-card__actions">
+        <button
+          type="button"
+          class="reactivate-btn reactivate-btn--cancel"
+          (click)="closeReactivateModal()"
+          [disabled]="isReactivating()">
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="reactivate-btn reactivate-btn--confirm"
+          (click)="confirmReactivate()"
+          [disabled]="isReactivating()">
+          @if (isReactivating()) {
+            <span class="reactivate-spinner"></span> Reativando...
+          } @else {
+            Reativar Cadastro
+          }
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

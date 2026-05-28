@@ -46,3 +46,133 @@ input.ng-valid.ng-touched {
     font-size: 12px;
     margin-top: 2px;
 }
+
+/* ===== Modal de Reativação ===== */
+.reactivate-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+  animation: rv-fade 0.18s ease;
+}
+
+@keyframes rv-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.reactivate-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 28px 24px 24px;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+  animation: rv-up 0.22s ease;
+}
+
+@keyframes rv-up {
+  from { transform: translateY(14px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.reactivate-card__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #f0fdf4;
+  border: 2px solid #86efac;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #16a34a;
+  margin-bottom: 4px;
+}
+
+.reactivate-card__title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111;
+  margin: 0;
+}
+
+.reactivate-card__text {
+  font-size: 14px;
+  color: #444;
+  margin: 0;
+  line-height: 1.55;
+}
+
+.reactivate-card__sub {
+  font-size: 13px;
+  color: #777;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.reactivate-card__actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.reactivate-btn {
+  flex: 1;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.reactivate-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.reactivate-btn--cancel {
+  background: #f3f3f3;
+  color: #555;
+  border: 1px solid #e0e0e0;
+}
+
+.reactivate-btn--confirm {
+  background: #16a34a;
+  color: #fff;
+}
+
+.reactivate-btn--confirm:hover:not(:disabled) {
+  background: #15803d;
+  transform: translateY(-1px);
+}
+
+.reactivate-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: rv-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes rv-spin {
+  to { transform: rotate(360deg); }
+}

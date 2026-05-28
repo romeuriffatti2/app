@@ -1,6 +1,6 @@
 .person-item {
   display: grid;
-  grid-template-columns: 2fr 2fr 1fr;
+  grid-template-columns: 2fr 2fr 1fr auto;
   align-items: center;
   gap: 12px;
 
@@ -55,4 +55,45 @@
   border-radius: 4px;
   letter-spacing: 0.5px;
   width: fit-content;
+}
+
+/* Botões de ação */
+.person-item__actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.person-item__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #e8e8e8;
+  border-radius: 7px;
+  background: #f9f9f9;
+  color: #999;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.15s ease;
+}
+
+.person-item__btn:hover {
+  transform: translateY(-1px);
+}
+
+.person-item__btn--edit:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #2563eb;
+}
+
+.person-item__btn--delete:hover {
+  background: #fff1f2;
+  border-color: #fca5a5;
+  color: #dc2626;
+}
+
+.person-item__btn:active {
+  transform: scale(0.94);
 }
