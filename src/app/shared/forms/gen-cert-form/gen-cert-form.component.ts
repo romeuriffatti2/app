@@ -12,21 +12,13 @@ import { PersonService } from '../../../services/person.service';
 import { PersonResponse } from '../../../models/person.interface';
 import { TemplateService } from '../../../services/template.service';
 import { PdfmeTemplate } from '../../../models/template.model';
-import { generate } from '@pdfme/generator';
-import { text, image, barcodes } from '@pdfme/schemas';
-import { getDefaultFont } from '@pdfme/common';
-import { API_BASE_URL } from '../../../api/api';
-import { PDFDocument } from 'pdf-lib';
-
-/** Host do servidor sem o prefixo /api — usado para acessar assets em /uploads/** */
-const SERVER_BASE_URL = API_BASE_URL.replace(/\/api$/, '');
-
-/** Dimensões do A4 em pontos (1pt = 25.4mm/72) para o PDF de background */
-const A4_LANDSCAPE_PT = { width: 841.89, height: 595.28 } as const;
+import { RegPersonFormComponent } from '../reg-person-form/reg-person-form.component';
+import { PdfGenerationService } from '../../../services/pdf-generation.service';
+import { CertificateMapperService } from '../../../services/certificate-mapper.service';
 @Component({
   selector: 'app-gen-cert-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, SecondaryButtonComponent, NgxMaskDirective],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, SecondaryButtonComponent, NgxMaskDirective, RegPersonFormComponent],
   providers: [provideNgxMask()],
   templateUrl: './gen-cert-form.component.html',
   styleUrl: './gen-cert-form.component.css',
@@ -38,6 +30,8 @@ export class GenCertFormComponent implements OnInit {
   private certificateService = inject(CertificateService);
   private personService = inject(PersonService);
   private templateService = inject(TemplateService);
+  private pdfService = inject(PdfGenerationService);
+  private mapperService = inject(CertificateMapperService);
 
   protected magazines = signal<MagazineResponse[]>([]);
   protected allPersons = signal<PersonResponse[]>([]);
@@ -47,8 +41,7 @@ export class GenCertFormComponent implements OnInit {
   protected manualNames = signal<CertificateItemRequest[]>([]);
   protected options1To100 = Array.from({ length: 100 }, (_, i) => i + 1);
 
-  // Recipient selection state
-  protected recipientMode = signal<'manual' | 'search'>('manual');
+  protected recipientMode = signal<'register' | 'search'>('search');
   protected searchQuery = signal<string>('');
 
   protected filteredPersons = computed(() => {
@@ -65,9 +58,6 @@ export class GenCertFormComponent implements OnInit {
     magazine: new FormControl('', Validators.required),
     volume: new FormControl(''),
     number: new FormControl(''),
-    manualName: new FormControl(''),
-    manualCpf: new FormControl(''),
-    manualEmail: new FormControl(''),
     evaluationId: new FormControl(''),
     cpf: new FormControl(''),
     startDate: new FormControl(''),
@@ -148,42 +138,13 @@ export class GenCertFormComponent implements OnInit {
     let isValid = true;
     fields.forEach(field => {
       const control = this.certificadoForm.get(field);
-      if (control?.invalid) {
-        control.markAsTouched();
-        isValid = false;
-      }
+      control?.invalid ? (control.markAsTouched(), isValid = false) : null;
     });
-
-    if (isValid) {
-      this.currentStep.set(2);
-    }
+    isValid ? this.currentStep.set(2) : null;
   }
 
   protected prevStep(): void {
     this.currentStep.set(1);
-  }
-
-  protected addManualName(event?: Event): void {
-    event?.preventDefault();
-    event?.stopPropagation();
-
-    const nameControl = this.certificadoForm.get('manualName');
-    const cpfControl = this.certificadoForm.get('manualCpf');
-    const emailControl = this.certificadoForm.get('manualEmail');
-    const name = nameControl?.value?.trim();
-    const cpf = cpfControl?.value?.trim();
-    const email = emailControl?.value?.trim();
-
-    if (!name) {
-      this.toastr.warning("Nome é obrigatório.");
-      return;
-    }
-
-    this.addPersonToList(name, cpf, email);
-
-    nameControl?.setValue('');
-    cpfControl?.setValue('');
-    emailControl?.setValue('');
   }
 
   protected addPersonFromSearch(person: PersonResponse): void {
@@ -244,7 +205,7 @@ export class GenCertFormComponent implements OnInit {
       certificates: this.manualNames()
     };
 
-    // 1. Usa o template selecionado que já foi carregado
+    // Usa o template selecionado que já foi carregado
     this.templateService.getById(request.magazineId, templateId).subscribe({
       next: async (res) => {
         try {
@@ -253,108 +214,23 @@ export class GenCertFormComponent implements OnInit {
             return;
           }
 
-          // Trata barras invertidas do JSON armazenado no banco
-          console.log('JSON Schema bruto do banco:', res.jsonSchema);
           const templateJson = JSON.parse(res.jsonSchema);
 
-          // Se basePdf for uma URL relativa do servidor, resolve para o formato PDF Data URI em memória usando a biblioteca pdf-lib
-          if (typeof templateJson.basePdf === 'string' && templateJson.basePdf.startsWith('/uploads/')) {
-            const absoluteImageUrl = `${SERVER_BASE_URL}${templateJson.basePdf}`;
-            try {
-              templateJson.basePdf = await this.imageUrlToPdfDataUri(absoluteImageUrl);
-            } catch (err) {
-              console.error("Erro ao converter imagem de fundo do template:", err);
-              // Fallback
-              templateJson.basePdf = absoluteImageUrl;
-            }
-          }
+          // 1. Mapeia os dados usando o CertificateMapperService (isola OCP)
+          const pdfInputs = this.mapperService.mapToPdfInputs(request, templateJson, this.magazines());
 
-          console.log('Template parseado para PDFME:', templateJson);
+          // 2. Gera os PDFs via PdfGenerationService (isola DIP/SRP)
+          const { mergedPdfBlob, individualPdfsBase64 } = await this.pdfService.generateCertificates(templateJson, pdfInputs);
 
-          // Pega o nome da revista
-          const magazine = this.magazines().find(m => m.id === request.magazineId);
-          const magazineName = magazine?.name || '';
-          const issn = magazine?.issn || '';
-          const magazineEmail = magazine?.email || '';
-          const responsavelTecnico = magazine?.responsavelTecnico || '';
-          const now = new Date();
-          const year = String(now.getFullYear());
-          const date = now.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+          // 3. Força download local do arquivo
+          this.pdfService.downloadBlob(mergedPdfBlob, 'certificados.pdf');
 
-          // Extrai o primeiro array de schemas (geralmente só tem um para uma página)
-          const pageSchemas = templateJson.schemas[0] || [];
-
-          // Monta os inputs para o PDFME fazendo a interpolação manual do texto
-          const inputs = request.certificates.map(item => {
-            const rawData: Record<string, string> = {
-              name: item.name || '',
-              cpf: item.metadata?.cpf || '',
-              validationCode: item.validationCode || '',
-              evaluationId: item.metadata?.evaluationId || '',
-              magazineName: magazineName,
-              issn: issn,
-              email: magazineEmail,
-              responsavelTecnico: responsavelTecnico,
-              year: year,
-              date: date,
-              volume: request.volume || '',
-              number: request.number || '',
-              dossieTitle: item.metadata?.dossieTitle || '',
-              articleTitle: item.metadata?.articleTitle || '',
-              publishMonthYear: item.metadata?.publishMonthYear || '',
-              doi: item.metadata?.doi || '',
-              accessLink: item.metadata?.accessLink || '',
-              startDate: item.metadata?.startDate || '',
-              endDate: item.metadata?.endDate || ''
-            };
-
-            const interpolatedInput: Record<string, string> = {};
-
-            // Para cada campo definido no schema, nós pegamos o 'content' padrão
-            // e substituímos as tags {{variavel}} pelo valor correspondente em rawData
-            pageSchemas.forEach((schemaField: any) => {
-              if (schemaField.type === 'text') {
-                let textContent = schemaField.content || '';
-                Object.keys(rawData).forEach(key => {
-                  const regex = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
-                  textContent = textContent.replace(regex, rawData[key]);
-                });
-                interpolatedInput[schemaField.name] = textContent;
-              } else {
-                // Se for imagem e existir um valor default no esquema (content), a gente usa ele.
-                // Se não existir, nós *não* adicionamos no input para que o PDFME use o comportamento padrão dele
-                // (e não sobrescreva com uma string vazia, o que apagaria a imagem do editor).
-                if (schemaField.content) {
-                  interpolatedInput[schemaField.name] = schemaField.content;
-                }
-              }
-            });
-
-            return interpolatedInput;
+          // 4. Acopla os Base64 nos dados da requisição para envio por email
+          request.certificates.forEach((cert, index) => {
+            cert.pdfBase64 = individualPdfsBase64[index];
           });
 
-          const plugins = { text, image, qrcode: barcodes.qrcode };
-          const options = { font: getDefaultFont() };
-
-          // 2. Gera o PDF mesclado para download do usuário
-          const pdfMerged = await generate({ template: templateJson, plugins, inputs, options });
-
-          // Dispara download do arquivo único (com várias páginas) imediatamente antes da req assíncrona
-          const blob = new Blob([pdfMerged], { type: 'application/pdf' });
-          const url = window.URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = 'certificados.pdf';
-          link.click();
-          window.URL.revokeObjectURL(url);
-
-          // 3. Gera os PDFs individuais em Base64 para envio ao backend (e-mails individuais)
-          for (let i = 0; i < request.certificates.length; i++) {
-            const singlePdf = await generate({ template: templateJson, plugins, inputs: [inputs[i]], options });
-            request.certificates[i].pdfBase64 = this.uint8ArrayToBase64(singlePdf);
-          }
-
-          // 4. Envia para o backend para salvar e disparar e-mails
+          // 5. Salva e processa no backend
           this.certificateService.generateCertificates(request).subscribe({
             next: () => {
               this.toastr.success("Certificados gerados e processados com sucesso!");
@@ -375,81 +251,6 @@ export class GenCertFormComponent implements OnInit {
       error: () => {
         this.toastr.error("Erro ao buscar o template para o certificado.");
       }
-    });
-  }
-
-  private uint8ArrayToBase64(bytes: Uint8Array): string {
-    let binary = '';
-    const len = bytes.byteLength;
-    for (let i = 0; i < len; i++) {
-      binary += String.fromCharCode(bytes[i]);
-    }
-    return window.btoa(binary);
-  }
-
-  /**
-   * Converte uma imagem de uma URL pública para data:application/pdf;base64,...
-   */
-  private async imageUrlToPdfDataUri(url: string): Promise<string> {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`HTTP ${response.status} ao buscar imagem`);
-    const buffer = await response.arrayBuffer();
-    const contentType = response.headers.get('content-type') ?? 'image/jpeg';
-    return this.imageBufferToPdfDataUri(buffer, contentType);
-  }
-
-  /**
-   * Empacota bytes de uma imagem PNG ou JPEG em um PDF A4 paisagem usando pdf-lib.
-   * Retorna data:application/pdf;base64,... — formato exigido pelo PDFME.
-   */
-  private async imageBufferToPdfDataUri(buffer: ArrayBuffer, mimeType: string): Promise<string> {
-    const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage([A4_LANDSCAPE_PT.width, A4_LANDSCAPE_PT.height]);
-
-    let embeddedImage;
-    if (mimeType.includes('png')) {
-      embeddedImage = await pdfDoc.embedPng(buffer);
-    } else {
-      try {
-        embeddedImage = await pdfDoc.embedJpg(buffer);
-      } catch {
-        embeddedImage = await pdfDoc.embedJpg(await this.toJpegViaCanvas(buffer, mimeType));
-      }
-    }
-
-    page.drawImage(embeddedImage, {
-      x: 0, y: 0,
-      width: A4_LANDSCAPE_PT.width,
-      height: A4_LANDSCAPE_PT.height
-    });
-
-    const pdfBytes = await pdfDoc.save();
-    const b64 = btoa(Array.from(new Uint8Array(pdfBytes), b => String.fromCharCode(b)).join(''));
-    return `data:application/pdf;base64,${b64}`;
-  }
-
-  /**
-   * Converte qualquer formato de imagem (incluindo WebP) para JPEG via Canvas API.
-   * Usado como fallback quando pdf-lib não suporta o formato diretamente.
-   */
-  private toJpegViaCanvas(buffer: ArrayBuffer, mimeType: string): Promise<ArrayBuffer> {
-    return new Promise((resolve, reject) => {
-      const blob = new Blob([buffer], { type: mimeType });
-      const objectUrl = URL.createObjectURL(blob);
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-        canvas.getContext('2d')!.drawImage(img, 0, 0);
-        URL.revokeObjectURL(objectUrl);
-        canvas.toBlob(
-          blob => blob ? blob.arrayBuffer().then(resolve).catch(reject) : reject(new Error('Canvas toBlob falhou')),
-          'image/jpeg', 0.92
-        );
-      };
-      img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error('Falha ao carregar imagem no Canvas')); };
-      img.src = objectUrl;
     });
   }
 }

@@ -141,28 +141,15 @@
         <label>Modo de inserção de destinatários</label>
         <select [ngModel]="recipientMode()" (ngModelChange)="recipientMode.set($event)"
             [ngModelOptions]="{standalone: true}">
-            <option value="manual">Adicionar Manualmente</option>
             <option value="search">Pesquisar Pessoas</option>
+            <option value="register">Cadastrar Nova Pessoa</option>
         </select>
     </div>
 
-    @if (recipientMode() === 'manual') {
-    <div class="form-group column-group">
-        <div class="field">
-            <label>Nome da Pessoa</label>
-            <input type="text" formControlName="manualName" placeholder="Digite o nome completo">
-        </div>
-        <div class="field">
-            <label>CPF <span class="optional">(opcional)</span></label>
-            <input type="text" formControlName="manualCpf" placeholder="000.000.000-00" mask="000.000.000-00">
-        </div>
-        <div class="field">
-            <label>E-mail <span class="optional">(opcional)</span></label>
-            <input type="text" formControlName="manualEmail" placeholder="exemplo@email.com">
-        </div>
+    @if (recipientMode() === 'register') {
+    <div class="form-group">
+        <app-reg-person-form></app-reg-person-form>
     </div>
-    <app-secondary-button [text]="'Adicionar à Lista'" type="button"
-        (click)="addManualName($event)"></app-secondary-button>
     } @else {
     <div class="form-group">
         <label>Pesquisar Pessoa</label>
