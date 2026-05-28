@@ -3,7 +3,7 @@ import { generate } from '@pdfme/generator';
 import { text, image, barcodes } from '@pdfme/schemas';
 import { getDefaultFont } from '@pdfme/common';
 import { PDFDocument } from 'pdf-lib';
-import { API_BASE_URL } from '../../api/api';
+import { API_BASE_URL } from '../api/api';
 
 const SERVER_BASE_URL = API_BASE_URL.replace(/\/api$/, '');
 const A4_LANDSCAPE_PT = { width: 841.89, height: 595.28 } as const;
@@ -51,7 +51,6 @@ export class PdfGenerationService {
 
     return { mergedPdfBlob, individualPdfsBase64 };
   }
-
   /**
    * Força o download de um Blob no navegador
    */
