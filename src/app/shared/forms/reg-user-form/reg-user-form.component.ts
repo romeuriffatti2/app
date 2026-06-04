@@ -18,6 +18,9 @@ export class RegUserFormComponent {
   private userService = inject(UserService);
   private toastr = inject(ToastrService);
 
+  protected showPassword = false;
+  protected showConfirmPassword = false;
+
   protected userForm = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),
     email: new FormControl('', [Validators.required, Validators.email]),
@@ -28,9 +31,36 @@ export class RegUserFormComponent {
       Validators.pattern(/^\d{11}$/)
     ]),
     password: new FormControl('', [Validators.required, Validators.minLength(6)]),
+    confirmPassword: new FormControl('', [Validators.required]),
     birthDate: new FormControl<string | null>(null),
     role: new FormControl<'ADMIN' | 'CLIENT'>('CLIENT', [Validators.required]),
+  }, {
+    validators: (control) => {
+      const password = control.get('password');
+      const confirmPassword = control.get('confirmPassword');
+      if (!password || !confirmPassword) return null;
+
+      if (password.value !== confirmPassword.value) {
+        confirmPassword.setErrors({ ...confirmPassword.errors, mustMatch: true });
+        return { mustMatch: true };
+      } else {
+        if (confirmPassword.hasError('mustMatch')) {
+          const errors = { ...confirmPassword.errors };
+          delete errors['mustMatch'];
+          confirmPassword.setErrors(Object.keys(errors).length ? errors : null);
+        }
+        return null;
+      }
+    }
   });
+
+  protected togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
+
+  protected toggleConfirmPassword() {
+    this.showConfirmPassword = !this.showConfirmPassword;
+  }
 
   private stripMask(value: string): string {
     return value.replace(/\D/g, '');
@@ -56,6 +86,8 @@ export class RegUserFormComponent {
       next: (res) => {
         this.toastr.success(`Usuário "${res.name}" cadastrado com sucesso!`);
         this.userForm.reset({ role: 'CLIENT' });
+        this.showPassword = false;
+        this.showConfirmPassword = false;
       },
       error: (err) => {
         const msg = err?.error?.message || 'Erro ao cadastrar usuário';
