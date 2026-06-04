@@ -1,54 +1,81 @@
 <div class="list-container">
   @if (isLoading()) {
-  <div class="loading-state">Carregando certificados...</div>
+  <div class="cert-list__loading">
+    <span class="cert-list__spinner"></span>
+    <span>Carregando certificados...</span>
+  </div>
   } @else {
   @if (certificates().length === 0) {
-  <div class="empty-state">
-    <span class="empty-icon">📭</span>
+  <div class="cert-list__empty">
+    <span class="cert-list__empty-icon">📭</span>
     <p>Nenhum certificado emitido encontrado.</p>
   </div>
   } @else {
-  <div class="table-responsive">
-    <table class="list-table">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Revista</th>
-          <th>Tipo</th>
-          <th>Data Emissão</th>
-          <th class="actions-col">Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (cert of certificates(); track cert.id) {
-        <tr>
-          <td>{{ cert.name }}</td>
-          <td>{{ cert.magazineResponse.name || '-' }}</td>
-          <td>{{ cert.type }}</td>
-          <td>{{ cert.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
-          <td class="actions-col">
-            <button class="action-btn download-btn" title="Baixar PDF" (click)="onDownload(cert)"
-              [disabled]="isActionLoading()">
-              ⬇️
-            </button>
-            <button class="action-btn email-btn" title="Reenviar por E-mail" (click)="onResendEmail(cert)"
-              [disabled]="isActionLoading()">
-              📧
-            </button>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
+
+  <!-- Header count -->
+  <div class="cert-list__header">
+    <span class="cert-list__count">{{ certificates().length }} certificado(s) encontrado(s)</span>
+  </div>
+
+  <!-- Cards -->
+  <div class="cert-list__items">
+    @for (cert of certificates(); track cert.id) {
+    <div class="cert-item">
+      <!-- Nome -->
+      <div class="cert-item__col cert-item__col--name">
+        <span class="cert-item__label">Nome</span>
+        <span class="cert-item__value">{{ cert.name || '—' }}</span>
+      </div>
+
+      <!-- Revista -->
+      <div class="cert-item__col">
+        <span class="cert-item__label">Revista</span>
+        <span class="cert-item__value">{{ cert.magazineResponse.name || '—' }}</span>
+      </div>
+
+      <!-- Tipo -->
+      <div class="cert-item__col">
+        <span class="cert-item__label">Tipo</span>
+        <span class="cert-item__value cert-item__value--badge">{{ cert.type }}</span>
+      </div>
+
+      <!-- Data -->
+      <div class="cert-item__col">
+        <span class="cert-item__label">Data Emissão</span>
+        <span class="cert-item__value">{{ cert.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+
+      <!-- Ações -->
+      <div class="cert-item__col cert-item__col--actions">
+        <button class="cert-item__btn cert-item__btn--download" title="Baixar PDF" (click)="onDownload(cert)"
+          [disabled]="isActionLoading()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+        </button>
+        <button class="cert-item__btn cert-item__btn--email" title="Reenviar por E-mail" (click)="onResendEmail(cert)"
+          [disabled]="isActionLoading()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+          </svg>
+        </button>
+      </div>
+    </div>
+    }
   </div>
 
   <!-- Pagination -->
   <div class="pagination">
-    <button class="btn-secondary" [disabled]="page() === 0" (click)="prevPage()">
+    <button class="btn-page" [disabled]="page() === 0" (click)="prevPage()">
       Anterior
     </button>
     <span class="page-info">Página {{ page() + 1 }} de {{ totalPages() }}</span>
-    <button class="btn-secondary" [disabled]="page() >= totalPages() - 1 || totalPages() === 0" (click)="nextPage()">
+    <button class="btn-page" [disabled]="page() >= totalPages() - 1 || totalPages() === 0" (click)="nextPage()">
       Próxima
     </button>
   </div>

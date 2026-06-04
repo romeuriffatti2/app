@@ -47,7 +47,7 @@
 
 .person-item__value--badge {
   display: inline-block;
-  background: #111;
+  background: var(--color-primary);
   color: #fff;
   font-size: 12px;
   font-weight: 600;

@@ -112,16 +112,4 @@ export class TemplateListComponent implements OnInit {
     return labels[type] ?? type;
   }
 
-  typeColor(type: string): string {
-    const colors: Record<string, string> = {
-      participacao: '#6366f1',
-      publicacao: '#0ea5e9',
-      parecerista: '#f59e0b',
-      'corpo-editorial': '#10b981',
-      dossie: '#8b5cf6',
-      aceite: '#ef4444',
-      custom: '#64748b'
-    };
-    return colors[type] ?? '#64748b';
-  }
 }

@@ -70,8 +70,8 @@ input[type="text"] {
 select:focus,
 input:focus {
     outline: none;
-    border-color: #1976d2;
-    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.15);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
 }
 
 /* ========================= */
@@ -139,8 +139,8 @@ input:focus {
 
 /* hover suave */
 .names-list li:hover {
-    background: #eef4ff;
-    border-color: #1976d2;
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
 }
 
 /* texto */
@@ -267,7 +267,7 @@ form>app-secondary-button {
 }
 
 .add-button {
-    background: #111;
+    background: var(--color-primary);
     color: white;
     border: none;
     border-radius: 6px;
@@ -279,5 +279,5 @@ form>app-secondary-button {
 }
 
 .add-button:hover {
-    background: #333;
+    background: var(--color-primary-hover);
 }

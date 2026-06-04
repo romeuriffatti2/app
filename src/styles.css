@@ -2,20 +2,51 @@
 @import 'ngx-toastr/toastr';
 
 :root {
+    /* ── Tipografia ─────────────────────────────── */
     --primary-font: "Inter", Helvetica, sans-serif;
-    --blue-primary: #1E3A8A; /* Dark blue */
-    --blue-secondary: #2563EB;
-    --blue-tertiary: #DBEAFE;
-    --bg-color: #0F172A; /* Slate 900 */
-    --text-main: #F8FAFC; /* Slate 50 */
-    --black: #0F172A; /* Modified to deep blue */
-    --purple-100: #a274a7;
-    --purple-200: #6d566e;
-    --blue-200: #4e66db;
-    --blue-300: #6076DF;
-    --gray-200: #D9D9D9;
-    --purple: #591AB2;
-    --gray: #2E2938;
+
+    /* ── Paleta institucional (Roxo + Azul) ─────── */
+    --color-primary:       #5B21B6;
+    --color-primary-hover: #4C1D95;
+    --color-primary-light: #EDE9FE;
+    --color-primary-mid:   #7C3AED;
+    --color-secondary:     #1E3A8A;
+    --color-accent:        #2563EB;
+
+    /* ── Superfícies e fundos ────────────────────── */
+    --color-bg-page:    #FFFFFF;
+    --color-bg-surface: #F8FAFC;
+    --color-bg-public:  #EFF6FF;
+    --color-bg-sidebar: #1E1B2E;
+
+    /* ── Bordas ──────────────────────────────────── */
+    --color-border:        #E2E8F0;
+    --color-border-strong: #CBD5E1;
+
+    /* ── Texto ───────────────────────────────────── */
+    --color-text-primary:   #1E293B;
+    --color-text-secondary: #64748B;
+    --color-text-muted:     #94A3B8;
+
+    /* ── Estados semânticos ──────────────────────── */
+    --color-success: #059669;
+    --color-error:   #DC2626;
+    --color-warning: #D97706;
+
+    /* ── Aliases de retrocompatibilidade ─────────── */
+    --bg-color:        #EFF6FF;
+    --text-main:       #1E293B;
+    --black:           #1E1B2E;
+    --blue-primary:    #1E3A8A;
+    --blue-secondary:  #2563EB;
+    --blue-tertiary:   #DBEAFE;
+    --purple:          #5B21B6;
+    --gray:            #64748B;
+    --gray-200:        #E2E8F0;
+    --purple-100:      #7C3AED;
+    --purple-200:      #5B21B6;
+    --blue-200:        #2563EB;
+    --blue-300:        #3B82F6;
 }
 
 * {
@@ -28,6 +59,6 @@
 body {
     width: 100vw;
     height: 100vh;
-    background-color: var(--black);
-    color: var(--text-main);
+    background-color: var(--color-bg-public);
+    color: var(--color-text-primary);
 }

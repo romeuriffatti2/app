@@ -2,28 +2,39 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 40px;
+    padding: 0 2rem;
     height: 64px;
     width: 100%;
-    background: #111;
+    background: var(--color-bg-sidebar);
     color: white;
     box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+/* ── Brand ──────────────────────────────── */
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    cursor: pointer;
+    user-select: none;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+}
+
+.nav-brand:hover {
+    opacity: 0.85;
 }
 
 .logo {
     font-size: 20px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    cursor: pointer;
+    font-weight: 800;
+    letter-spacing: 2px;
     color: white;
-    transition: opacity 0.2s ease;
-    user-select: none;
+    margin: 0;
 }
 
-.logo:hover {
-    opacity: 0.75;
-}
-
+/* ── Links (reserved) ───────────────────── */
 .nav-links {
     display: flex;
     gap: 24px;
@@ -31,7 +42,7 @@
 }
 
 .nav-link {
-    color: #aaa;
+    color: #94A3B8;
     text-decoration: none;
     font-size: 14px;
     font-weight: 500;
@@ -43,7 +54,27 @@
     color: #fff;
 }
 
+/* ── Actions ────────────────────────────── */
 .nav-actions {
     display: flex;
     align-items: center;
+}
+
+/* Override app-button inside navbar to be outline style */
+.nav-actions app-button button {
+    background: transparent !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.45) !important;
+    color: white !important;
+    min-width: 110px !important;
+    padding: 8px 18px !important;
+    font-size: 14px !important;
+    box-shadow: none !important;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.nav-actions app-button button:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.7) !important;
+    transform: none !important;
+    box-shadow: none !important;
 }

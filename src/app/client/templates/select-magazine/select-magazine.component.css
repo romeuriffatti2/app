@@ -1,10 +1,10 @@
 /* ── Page layout ────────────────────────────────────────────── */
 .page-wrapper {
   min-height: 100vh;
-  background: #0a0f1e;
+  background: var(--color-bg-page);
   padding: 2rem;
-  font-family: 'Inter', 'Segoe UI', sans-serif;
-  color: #e2e8f0;
+  font-family: var(--primary-font), sans-serif;
+  color: var(--color-text-primary);
 }
 
 /* ── Header ─────────────────────────────────────────────────── */
@@ -24,28 +24,25 @@
 .header-icon {
   width: 52px;
   height: 52px;
-  background: linear-gradient(135deg, #8b5cf6, #d946ef);
+  background: var(--color-primary);
   border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 4px 12px rgba(91, 33, 182, 0.25);
 }
 
 .page-title {
   margin: 0;
   font-size: 1.75rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #e2e8f0, #94a3b8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-text-primary);
 }
 
 .page-subtitle {
   margin: 0.25rem 0 0;
-  color: #64748b;
+  color: var(--color-text-secondary);
   font-size: 0.9rem;
 }
 
@@ -54,27 +51,28 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: linear-gradient(135deg, #8b5cf6, #a855f7);
+  background: var(--color-primary);
   color: white;
   border: none;
   padding: 0.7rem 1.4rem;
-  border-radius: 12px;
+  border-radius: 10px;
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 2px 8px rgba(91, 33, 182, 0.2);
   text-decoration: none;
 }
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.5);
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(91, 33, 182, 0.3);
 }
 
 .btn-outline {
   background: transparent;
-  color: #8b5cf6;
-  border: 1.5px solid #8b5cf6;
+  color: var(--color-text-secondary);
+  border: 1.5px solid var(--color-border-strong);
   padding: 0.6rem 1.2rem;
   border-radius: 10px;
   font-size: 0.875rem;
@@ -87,7 +85,9 @@
   text-decoration: none;
 }
 .btn-outline:hover {
-  background: rgba(139, 92, 246, 0.1);
+  background: var(--color-bg-surface);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 /* ── Grid of Magazines ───────────────────────────────────────── */
@@ -99,26 +99,27 @@
 
 /* ── Magazine Card ───────────────────────────────────────────── */
 .magazine-card {
-  background: #111827;
-  border: 1px solid #1e293b;
-  border-radius: 18px;
+  background: var(--color-bg-page);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
   overflow: hidden;
   position: relative;
-  transition: all 0.25s ease;
+  transition: all 0.22s ease;
   display: flex;
   flex-direction: column;
   cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 .magazine-card:hover {
-  border-color: #8b5cf6;
-  transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(0,0,0,.4);
+  border-color: var(--color-primary);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(91, 33, 182, 0.1);
 }
 
 .card-accent {
-  height: 4px;
+  height: 3px;
   width: 100%;
-  background: linear-gradient(90deg, #8b5cf6, #d946ef);
+  background: var(--color-primary);
 }
 
 .card-body {
@@ -134,34 +135,34 @@
 }
 
 .issn-badge {
-  background: rgba(139, 92, 246, 0.15);
-  color: #a78bfa;
-  padding: 0.25rem 0.75rem;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  padding: 0.2rem 0.65rem;
   border-radius: 20px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: .4px;
+  letter-spacing: .3px;
 }
 
 .card-title {
   margin: 0 0 0.5rem;
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--color-text-primary);
   line-height: 1.3;
 }
 
 .card-info {
   margin: 0.35rem 0;
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: var(--color-text-secondary);
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
 .card-info svg {
-  color: #8b5cf6;
+  color: var(--color-primary-mid);
   flex-shrink: 0;
 }
 
@@ -169,16 +170,16 @@
   display: flex;
   justify-content: flex-end;
   padding: 1rem 1.5rem 1.5rem;
-  border-top: 1px solid #1e293b;
+  border-top: 1px solid var(--color-border);
 }
 
 .select-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: rgba(139, 92, 246, 0.1);
-  color: #a78bfa;
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border: 1px solid rgba(91, 33, 182, 0.25);
   padding: 0.5rem 1rem;
   border-radius: 8px;
   font-size: 0.8rem;
@@ -188,10 +189,10 @@
 }
 
 .magazine-card:hover .select-btn {
-  background: linear-gradient(135deg, #8b5cf6, #a855f7);
+  background: var(--color-primary);
   color: white;
   border-color: transparent;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 3px 10px rgba(91, 33, 182, 0.25);
 }
 
 /* ── Loading / Empty states ──────────────────────────────────── */
@@ -202,11 +203,11 @@
 }
 
 .skeleton-card {
-  height: 200px;
-  background: linear-gradient(90deg, #111827 25%, #1e293b 50%, #111827 75%);
+  height: 180px;
+  background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
-  border-radius: 18px;
+  border-radius: 14px;
 }
 @keyframes shimmer {
   from { background-position: 200% 0; }
@@ -217,15 +218,15 @@
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
-  background: #111827;
-  border: 1px dashed #1e293b;
-  border-radius: 18px;
-  color: #64748b;
+  background: var(--color-bg-surface);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: 14px;
+  color: var(--color-text-secondary);
   max-width: 600px;
   margin: 2rem auto;
 }
 
 .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
-.empty-state h3 { color: #94a3b8; margin: 0 0 0.5rem; font-size: 1.25rem; }
+.empty-state h3 { color: var(--color-text-primary); margin: 0 0 0.5rem; font-size: 1.25rem; }
 .empty-state p { margin: 0 0 1.5rem; font-size: 0.95rem; line-height: 1.5; }
-.error-state p { color: #f87171; margin: 0.75rem 0 1.5rem; }
+.error-state p { color: var(--color-error); margin: 0.75rem 0 1.5rem; }

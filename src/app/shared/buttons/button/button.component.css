@@ -1,20 +1,22 @@
 button {
     padding: 12px 20px;
     border-radius: 10px;
-    background-color: var(--black);
+    background-color: var(--color-primary);
     color: white;
 
     border: none;
     min-width: 200px;
 
     font-size: 15px;
-    font-weight: 500;
+    font-weight: 600;
 
     transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(91, 33, 182, 0.2);
 }
 
 button:hover {
     cursor: pointer;
     transform: translateY(-2px);
-    background-color: #333;
+    background-color: var(--color-primary-hover);
+    box-shadow: 0 4px 14px rgba(91, 33, 182, 0.3);
 }

@@ -65,12 +65,12 @@
         <div class="template-card" [class.is-loading]="actionLoading() === template.id">
 
           <!-- Card top accent bar -->
-          <div class="card-accent" [style.background]="typeColor(template.type)"></div>
+          <div class="card-accent"></div>
 
           <!-- Card body -->
           <div class="card-body">
             <div class="card-header-row">
-              <span class="type-badge" [style.background]="typeColor(template.type) + '22'" [style.color]="typeColor(template.type)">
+              <span class="type-badge">
                 {{ typeLabel(template.type) }}
               </span>
               @if (template.sourceTemplateId) {
