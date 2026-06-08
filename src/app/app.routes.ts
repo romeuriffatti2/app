@@ -19,6 +19,13 @@ export const routes: Routes = [
     component: ValidateCertComponent
   },
   {
+    path: 'tutorial/app-password',
+    loadComponent: () =>
+      import('./shared/tutorial/app-password-tutorial/app-password-tutorial.component').then(
+        m => m.AppPasswordTutorialComponent
+      )
+  },
+  {
     path: 'templates',
     canActivate: [authGuard],
     children: [

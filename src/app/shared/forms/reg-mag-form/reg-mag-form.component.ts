@@ -47,4 +47,8 @@ export class RegMagFormComponent {
       }
     });
   }
+
+  protected openTutorial(): void {
+    window.open('/tutorial/app-password', '_blank', 'noopener,noreferrer');
+  }
 }

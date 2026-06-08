@@ -52,3 +52,26 @@ input.ng-valid.ng-touched {
     font-size: 12px;
     margin-top: 2px;
 }
+
+.help-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-primary);
+    text-decoration: none;
+    width: fit-content;
+    transition: color 0.15s ease, gap 0.15s ease;
+}
+
+.help-link:hover {
+    color: var(--color-primary-hover);
+    gap: 7px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
