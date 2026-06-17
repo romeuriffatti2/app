@@ -17,14 +17,14 @@
     </div>
 
     <div class="form-group">
-        <label for="cpf">CPF</label>
+        <label for="cpf">CPF <span class="optional">(opcional)</span></label>
         <input
             id="cpf"
             formControlName="cpf"
             placeholder="000.000.000-00"
             mask="000.000.000-00">
         @if(personForm.get('cpf')?.touched && personForm.get('cpf')?.invalid){
-        <span class="error">CPF inválido</span>
+        <span class="error">CPF inválido (deve ter 11 dígitos quando informado)</span>
         }
     </div>
 
@@ -47,7 +47,7 @@
       <h3 class="reactivate-card__title">Cadastro Encontrado</h3>
 
       <p class="reactivate-card__text">
-        O CPF ou E-mail informado pertence ao cadastro de
+        Os dados informados pertencem ao cadastro de
         <strong>{{ deletedPersonName() }}</strong>,
         que foi excluído anteriormente do sistema.
       </p>

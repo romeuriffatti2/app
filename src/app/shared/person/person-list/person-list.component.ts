@@ -29,7 +29,7 @@ export class PersonListComponent implements OnInit {
 
     return this.persons().filter(p => {
       const matchName = !name || p.name.toLowerCase().includes(name);
-      const matchCpf = !cpf || p.cpf.replace(/\D/g, '').includes(cpf);
+      const matchCpf = !cpf || (p.cpf ?? '').replace(/\D/g, '').includes(cpf);
       return matchName && matchCpf;
     });
   });
@@ -43,10 +43,12 @@ export class PersonListComponent implements OnInit {
     name: new FormControl('', [Validators.required, Validators.minLength(3)]),
     email: new FormControl('', [Validators.required, Validators.email]),
     cpf: new FormControl('', [
-      Validators.required,
-      Validators.minLength(11),
-      Validators.maxLength(11),
-      Validators.pattern(/^\d{11}$/),
+      (control) => {
+        const val = control.value?.replace(/\D/g, '') ?? '';
+        if (!val) return null; // CPF é opcional
+        if (!/^\d{11}$/.test(val)) return { cpfInvalid: true };
+        return null;
+      }
     ]),
   });
 
@@ -88,7 +90,7 @@ export class PersonListComponent implements OnInit {
     this.editForm.setValue({
       name: person.name,
       email: person.email,
-      cpf: person.cpf.replace(/\D/g, ''),
+      cpf: person.cpf ? person.cpf.replace(/\D/g, '') : '',
     });
     this.isEditModalOpen.set(true);
   }
@@ -107,10 +109,11 @@ export class PersonListComponent implements OnInit {
 
     const person = this.editingPerson()!;
     const raw = this.editForm.value;
+    const strippedCpf = (raw.cpf ?? '').replace(/\D/g, '');
     const data: PersonUpdateRequest = {
       name: raw.name!,
       email: raw.email!,
-      cpf: raw.cpf!.replace(/\D/g, ''),
+      cpf: strippedCpf || undefined,
     };
 
     this.isSaving.set(true);

@@ -11,7 +11,7 @@
 
   <div class="person-item__col">
     <span class="person-item__label">CPF</span>
-    <span class="person-item__value person-item__value--badge">{{ person().cpf }}</span>
+    <span class="person-item__value person-item__value--badge">{{ person().cpf || 'Não informado' }}</span>
   </div>
 
   <div class="person-item__actions">

@@ -83,10 +83,10 @@
         </div>
 
         <div class="form-field">
-          <label class="form-field__label" for="edit-cpf">CPF <span class="form-field__hint">(apenas dígitos)</span></label>
+          <label class="form-field__label" for="edit-cpf">CPF <span class="form-field__hint">(opcional — apenas dígitos)</span></label>
           <input id="edit-cpf" class="form-field__input" type="text" formControlName="cpf" placeholder="00000000000" maxlength="11" />
           @if (editForm.get('cpf')?.invalid && editForm.get('cpf')?.touched) {
-            <span class="form-field__error">CPF inválido (11 dígitos numéricos)</span>
+            <span class="form-field__error">CPF inválido (11 dígitos numéricos quando informado)</span>
           }
         </div>
 
@@ -130,7 +130,8 @@
           <strong>{{ deletingPerson()!.name }}</strong>.
         </p>
         <p class="modal-danger__sub">
-          Esta ação é reversível — o registro poderá ser reativado futuramente caso o CPF seja reutilizado no cadastro.
+          Esta ação é reversível — o registro poderá ser reativado futuramente
+          através do email ou CPF do cadastro.
           O histórico de certificados vinculados será preservado.
         </p>
       </div>

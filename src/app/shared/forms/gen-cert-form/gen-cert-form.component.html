@@ -148,7 +148,7 @@
 
     @if (recipientMode() === 'register') {
     <div class="form-group">
-        <app-reg-person-form></app-reg-person-form>
+        <app-reg-person-form (personRegistered)="onPersonRegistered($event)"></app-reg-person-form>
     </div>
     } @else {
     <div class="form-group">

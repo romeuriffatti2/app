@@ -48,7 +48,7 @@ export class GenCertFormComponent implements OnInit {
     const query = this.searchQuery().toLowerCase().trim();
     if (!query) return [];
     return this.allPersons().filter(p =>
-      p.name.toLowerCase().includes(query) || p.cpf.includes(query)
+      p.name.toLowerCase().includes(query) || (p.cpf ?? '').includes(query)
     );
   });
 
@@ -145,6 +145,11 @@ export class GenCertFormComponent implements OnInit {
 
   protected prevStep(): void {
     this.currentStep.set(1);
+  }
+
+  protected onPersonRegistered(person: PersonResponse): void {
+    // Insere a nova pessoa na lista local sem nova chamada HTTP
+    this.allPersons.update(list => [...list, person]);
   }
 
   protected addPersonFromSearch(person: PersonResponse): void {
