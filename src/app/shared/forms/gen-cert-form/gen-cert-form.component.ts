@@ -42,14 +42,23 @@ export class GenCertFormComponent implements OnInit {
   protected options1To100 = Array.from({ length: 100 }, (_, i) => i + 1);
 
   protected recipientMode = signal<'register' | 'search'>('search');
-  protected searchQuery = signal<string>('');
+  protected searchName = signal<string>('');
+  protected searchCpf = signal<string>('');
+  protected searchEmail = signal<string>('');
 
   protected filteredPersons = computed(() => {
-    const query = this.searchQuery().toLowerCase().trim();
-    if (!query) return [];
-    return this.allPersons().filter(p =>
-      p.name.toLowerCase().includes(query) || (p.cpf ?? '').includes(query)
-    );
+    const name = this.searchName().toLowerCase().trim();
+    const cpf = this.searchCpf().replace(/\D/g, '');
+    const email = this.searchEmail().toLowerCase().trim();
+
+    if (!name && !cpf && !email) return [];
+
+    return this.allPersons().filter(p => {
+      const matchName = !name || p.name.toLowerCase().includes(name);
+      const matchCpf = !cpf || (p.cpf ?? '').replace(/\D/g, '').includes(cpf);
+      const matchEmail = !email || p.email.toLowerCase().includes(email);
+      return matchName && matchCpf && matchEmail;
+    });
   });
 
   protected certificadoForm = new FormGroup({
@@ -64,7 +73,8 @@ export class GenCertFormComponent implements OnInit {
     endDate: new FormControl(''),
     dossieTitle: new FormControl(''),
     articleTitle: new FormControl(''),
-    publishMonthYear: new FormControl(''),
+    publishMonth: new FormControl(''),
+    publishYear: new FormControl(''),
     doi: new FormControl(''),
     accessLink: new FormControl('')
   });
@@ -154,7 +164,9 @@ export class GenCertFormComponent implements OnInit {
 
   protected addPersonFromSearch(person: PersonResponse): void {
     this.addPersonToList(person.name, person.cpf, person.email, person.id);
-    this.searchQuery.set('');
+    this.searchName.set('');
+    this.searchCpf.set('');
+    this.searchEmail.set('');
   }
 
   private addPersonToList(name: string, cpf?: string | null, email?: string | null, personId?: number | null): void {
@@ -176,7 +188,8 @@ export class GenCertFormComponent implements OnInit {
         endDate: this.certificadoForm.get('endDate')?.value || null,
         dossieTitle: this.certificadoForm.get('dossieTitle')?.value || null,
         articleTitle: this.certificadoForm.get('articleTitle')?.value || null,
-        publishMonthYear: this.certificadoForm.get('publishMonthYear')?.value || null,
+        publishMonth: this.certificadoForm.get('publishMonth')?.value || null,
+        publishYear: this.certificadoForm.get('publishYear')?.value || null,
         doi: this.certificadoForm.get('doi')?.value || null,
         accessLink: this.certificadoForm.get('accessLink')?.value || null
       }

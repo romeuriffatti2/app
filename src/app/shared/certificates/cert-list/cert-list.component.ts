@@ -1,11 +1,14 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { CertificateResponse, CertificateService, Page } from '../../../services/certificate.service';
 
 @Component({
   selector: 'app-cert-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './cert-list.component.html',
   styleUrl: './cert-list.component.css'
 })
@@ -18,13 +21,37 @@ export class CertListComponent implements OnInit {
   protected isLoading = signal<boolean>(false);
   protected isActionLoading = signal<boolean>(false);
 
+  // --- Filtros ---
+  protected searchName = signal<string>('');
+  protected searchCpf = signal<string>('');
+  protected searchEmail = signal<string>('');
+
+  private searchSubject = new Subject<void>();
+
+  constructor() {
+    this.searchSubject.pipe(
+      debounceTime(400)
+    ).subscribe(() => {
+      this.page.set(0);
+      this.loadCertificates();
+    });
+  }
+
   ngOnInit(): void {
     this.loadCertificates();
   }
 
+  protected onSearchChange() {
+    this.searchSubject.next();
+  }
+
   loadCertificates(pageIndex: number = 0) {
     this.isLoading.set(true);
-    this.certService.getCertificates(pageIndex, 10).subscribe({
+    const name = this.searchName().trim();
+    const cpf = this.searchCpf().replace(/\D/g, '');
+    const email = this.searchEmail().trim();
+
+    this.certService.getCertificates(pageIndex, 10, name, cpf, email).subscribe({
       next: (page: Page<CertificateResponse>) => {
         this.certificates.set(page.content);
         this.page.set(page.number);

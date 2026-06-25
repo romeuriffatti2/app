@@ -33,8 +33,11 @@ export class CertificateService {
     return this.http.post<void>(API_BASE_URL + "/certificate/generate", request)
   }
 
-  public getCertificates(page: number = 0, size: number = 10): Observable<Page<CertificateResponse>> {
+  public getCertificates(page: number = 0, size: number = 10, name?: string, cpf?: string, email?: string): Observable<Page<CertificateResponse>> {
     let params = new HttpParams().set('page', page.toString()).set('size', size.toString());
+    if (name) params = params.set('name', name);
+    if (cpf) params = params.set('cpf', cpf);
+    if (email) params = params.set('email', email);
     return this.http.get<Page<CertificateResponse>>(API_BASE_URL + "/certificate/list", { params });
   }
 

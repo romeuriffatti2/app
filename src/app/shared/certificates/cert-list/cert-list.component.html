@@ -1,4 +1,29 @@
 <div class="list-container">
+  <div style="padding: 16px; border: 1px solid #dcdfe4; border-radius: 8px; background: #fafafa; margin-bottom: 20px;">
+      <label style="display: block; font-size: 15px; font-weight: 600; color: #333; margin-bottom: 12px;">Filtros de Pesquisa</label>
+      
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+              <label style="font-size: 13px; font-weight: 500; color: #444;">Por nome</label>
+              <input type="text" [ngModel]="searchName()" (ngModelChange)="searchName.set($event); onSearchChange()"
+                  style="padding: 10px 12px; border: 1px solid #dcdfe4; border-radius: 6px; width: 100%; box-sizing: border-box; font-family: inherit; font-size: 14px;" placeholder="Nome...">
+          </div>
+          
+          <div style="display: flex; gap: 12px;">
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+                  <label style="font-size: 13px; font-weight: 500; color: #444;">Por CPF</label>
+                  <input type="text" [ngModel]="searchCpf()" (ngModelChange)="searchCpf.set($event); onSearchChange()"
+                      style="padding: 10px 12px; border: 1px solid #dcdfe4; border-radius: 6px; width: 100%; box-sizing: border-box; font-family: inherit; font-size: 14px;" placeholder="CPF...">
+              </div>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+                  <label style="font-size: 13px; font-weight: 500; color: #444;">Por E-mail</label>
+                  <input type="text" [ngModel]="searchEmail()" (ngModelChange)="searchEmail.set($event); onSearchChange()"
+                      style="padding: 10px 12px; border: 1px solid #dcdfe4; border-radius: 6px; width: 100%; box-sizing: border-box; font-family: inherit; font-size: 14px;" placeholder="E-mail...">
+              </div>
+          </div>
+      </div>
+  </div>
+
   @if (isLoading()) {
   <div class="cert-list__loading">
     <span class="cert-list__spinner"></span>

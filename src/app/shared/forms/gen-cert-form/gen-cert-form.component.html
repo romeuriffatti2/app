@@ -109,9 +109,15 @@
     }
 
     @if (selectedTemplateType === 'aceite') {
-    <div class="form-group">
-        <label>Mês e Ano de Publicação</label>
-        <input type="text" formControlName="publishMonthYear" placeholder="Ex: 03/2025" mask="00/0000">
+    <div class="form-group row-group">
+        <div class="field">
+            <label>Mês de Publicação</label>
+            <input type="text" formControlName="publishMonth" placeholder="Ex: 03" mask="00">
+        </div>
+        <div class="field">
+            <label>Ano de Publicação</label>
+            <input type="text" formControlName="publishYear" placeholder="Ex: 2025" mask="0000">
+        </div>
     </div>
     }
 
@@ -151,13 +157,30 @@
         <app-reg-person-form (personRegistered)="onPersonRegistered($event)"></app-reg-person-form>
     </div>
     } @else {
-    <div class="form-group">
-        <label>Pesquisar Pessoa</label>
-        <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
-            [ngModelOptions]="{standalone: true}" placeholder="Digite o nome ou CPF...">
+    <div class="form-group person-search-filters" style="gap: 12px; padding: 12px; border: 1px solid #dcdfe4; border-radius: 8px; background: #fafafa;">
+        <label style="font-size: 14px; font-weight: 600; color: #333; margin-bottom: 4px;">Pesquisar Pessoa</label>
+        
+        <div class="field">
+            <label>Por nome</label>
+            <input type="text" [ngModel]="searchName()" (ngModelChange)="searchName.set($event)"
+                [ngModelOptions]="{standalone: true}" placeholder="Nome...">
+        </div>
+        
+       
+            <div class="field">
+                <label>Por CPF</label>
+                <input type="text" [ngModel]="searchCpf()" (ngModelChange)="searchCpf.set($event)"
+                    [ngModelOptions]="{standalone: true}" placeholder="CPF...">
+            </div>
+            <div class="field">
+                <label>Por e-mail</label>
+                <input type="text" [ngModel]="searchEmail()" (ngModelChange)="searchEmail.set($event)"
+                    [ngModelOptions]="{standalone: true}" placeholder="E-mail...">
+            </div>
+    
     </div>
 
-    @if (searchQuery().length > 0) {
+    @if (searchName().length > 0 || searchCpf().length > 0 || searchEmail().length > 0) {
     <div class="search-results">
         @if (filteredPersons().length === 0) {
         <p class="empty-list">Nenhuma pessoa encontrada.</p>
