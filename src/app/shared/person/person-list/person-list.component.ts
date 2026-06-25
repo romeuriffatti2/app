@@ -22,15 +22,18 @@ export class PersonListComponent implements OnInit {
   // --- Filtros ---
   protected searchName = signal<string>('');
   protected searchCpf = signal<string>('');
+  protected searchEmail = signal<string>('');
 
   protected filteredPersons = computed(() => {
     const name = this.searchName().toLowerCase().trim();
     const cpf = this.searchCpf().replace(/\D/g, '');
+    const email = this.searchEmail().toLowerCase().trim();
 
     return this.persons().filter(p => {
       const matchName = !name || p.name.toLowerCase().includes(name);
       const matchCpf = !cpf || (p.cpf ?? '').replace(/\D/g, '').includes(cpf);
-      return matchName && matchCpf;
+      const matchEmail = !email || p.email.toLowerCase().includes(email);
+      return matchName && matchCpf && matchEmail;
     });
   });
 
@@ -82,6 +85,10 @@ export class PersonListComponent implements OnInit {
 
   protected onSearchCpfChange(value: string): void {
     this.searchCpf.set(value);
+  }
+
+  protected onSearchEmailChange(value: string): void {
+    this.searchEmail.set(value);
   }
 
   // --- Handlers de edição ---

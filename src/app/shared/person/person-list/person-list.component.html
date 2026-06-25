@@ -18,6 +18,16 @@
         (input)="onSearchNameChange($any($event.target).value)" />
     </div>
     <div class="person-list__filter-field">
+      <label class="person-list__filter-label" for="filter-email">Buscar por E-mail</label>
+      <input
+        id="filter-email"
+        class="person-list__filter-input"
+        type="text"
+        placeholder="Digite o e-mail..."
+        [value]="searchEmail()"
+        (input)="onSearchEmailChange($any($event.target).value)" />
+    </div>
+    <div class="person-list__filter-field">
       <label class="person-list__filter-label" for="filter-cpf">Buscar por CPF</label>
       <input
         id="filter-cpf"
