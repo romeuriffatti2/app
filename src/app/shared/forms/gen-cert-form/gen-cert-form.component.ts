@@ -45,6 +45,7 @@ export class GenCertFormComponent implements OnInit {
   protected searchName = signal<string>('');
   protected searchCpf = signal<string>('');
   protected searchEmail = signal<string>('');
+  protected isConfirmModalOpen = signal<boolean>(false);
 
   protected filteredPersons = computed(() => {
     const name = this.searchName().toLowerCase().trim();
@@ -214,6 +215,33 @@ export class GenCertFormComponent implements OnInit {
     const selectedTemplate = this.templates().find(t => t.id === templateId);
     const type = selectedTemplate?.type || '';
 
+    if (type === 'aceite' || type === 'publicacao') {
+      this.isConfirmModalOpen.set(true);
+    } else {
+      this.executeGeneration();
+    }
+  }
+
+  protected closeConfirmModal(): void {
+    this.isConfirmModalOpen.set(false);
+  }
+
+  protected confirmGeneration(): void {
+    this.isConfirmModalOpen.set(false);
+    
+    const sharedCode = crypto.randomUUID();
+    this.manualNames().forEach(item => {
+       item.validationCode = sharedCode;
+    });
+
+    this.executeGeneration();
+  }
+
+  private executeGeneration(): void {
+    const templateId = Number(this.certificadoForm.get('templateId')?.value);
+    const selectedTemplate = this.templates().find(t => t.id === templateId);
+    const type = selectedTemplate?.type || '';
+
     const request: CertificateRequest = {
       magazineId: Number(this.certificadoForm.get('magazine')?.value),
       type: type,
@@ -245,7 +273,7 @@ export class GenCertFormComponent implements OnInit {
 
           // 4. Acopla os Base64 nos dados da requisição para envio por email
           request.certificates.forEach((cert, index) => {
-            cert.pdfBase64 = individualPdfsBase64[index];
+            cert.pdfBase64 = individualPdfsBase64[type === 'aceite' || type === 'publicacao' ? 0 : index];
           });
 
           // 5. Salva e processa no backend

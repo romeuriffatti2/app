@@ -32,10 +32,26 @@ export class CertificateMapperService {
     // Extrai o primeiro array de schemas do PDFME (geralmente só tem um para uma página)
     const pageSchemas = templateJson.schemas[0] || [];
 
-    // Mapeia os dados para cada pessoa na lista de certificados
-    return request.certificates.map(item => {
+    let combinedNames = '';
+    let itemsToProcess = request.certificates;
+
+    if (request.type === 'aceite' || request.type === 'publicacao') {
+      const names = request.certificates.map(c => c.name);
+      if (names.length > 1) {
+        const last = names.pop();
+        combinedNames = names.join(', ') + ' e ' + last;
+      } else {
+        combinedNames = names[0] || '';
+      }
+      // Processa apenas 1 vez para gerar 1 PDF
+      itemsToProcess = [request.certificates[0]];
+    }
+
+    // Mapeia os dados
+    return itemsToProcess.map(item => {
+      const nameToUse = combinedNames ? combinedNames : (item.name || '');
       const rawData: Record<string, string> = {
-        name: item.name || '',
+        name: nameToUse,
         cpf: item.metadata?.cpf || '',
         validationCode: item.validationCode || '',
         evaluationId: item.metadata?.evaluationId || '',

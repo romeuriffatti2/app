@@ -78,7 +78,7 @@
 }
 
 .sidebar-dropdown.open .sidebar-submenu {
-    max-height: 140px;
+    max-height: 300px;
     opacity: 1;
 }
 

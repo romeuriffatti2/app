@@ -12,7 +12,7 @@
         <div class="sidebar-dropdown" [class.open]="isCertDropdownOpen()"
             (clickOutside)="isCertDropdownOpen.set(false)">
             <button class="sidebar-item sidebar-item--dropdown"
-                [class.active]="activeView() === 'cert' || activeView() === 'cert-list'"
+                [class.active]="['cert', 'cert-list', 'cert-list-aceite', 'cert-list-publicacao'].includes(activeView())"
                 (click)="onToggleCertDropdown()">
                 <span class="sidebar-icon">🎓</span>
                 Certificados
@@ -28,7 +28,17 @@
                 <button class="sidebar-subitem" [class.active]="activeView() === 'cert-list'"
                     (click)="onSelectView('cert-list')">
                     <span class="sidebar-icon">📋</span>
-                    Certificados Emitidos
+                    Certificados (Gerais)
+                </button>
+                <button class="sidebar-subitem" [class.active]="activeView() === 'cert-list-aceite'"
+                    (click)="onSelectView('cert-list-aceite')">
+                    <span class="sidebar-icon">📋</span>
+                    Declarações de Aceite
+                </button>
+                <button class="sidebar-subitem" [class.active]="activeView() === 'cert-list-publicacao'"
+                    (click)="onSelectView('cert-list-publicacao')">
+                    <span class="sidebar-icon">📋</span>
+                    Certificados de Publicação
                 </button>
             </div>
         </div>

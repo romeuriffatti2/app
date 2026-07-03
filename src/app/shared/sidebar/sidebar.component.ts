@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { ClickOutsideDirective } from '../directives/click-outside.directive';
 import { AuthService } from '../../services/auth.service';
 
-export type ViewMode = 'cert' | 'cert-list' | 'mag-form' | 'mag-list' | 'person-form' | 'person-list' | 'user-form' | 'none';
+export type ViewMode = 'cert' | 'cert-list' | 'cert-list-aceite' | 'cert-list-publicacao' | 'mag-form' | 'mag-list' | 'person-form' | 'person-list' | 'user-form' | 'none';
 
 @Component({
   selector: 'app-sidebar',

@@ -23,6 +23,15 @@ export interface CertificateResponse {
   createdAt: string;
 }
 
+export interface CertificateGroupResponse {
+  validationCode: string;
+  articleTitle: string;
+  type: string;
+  createdAt: string;
+  magazineResponse: { id: number; name: string };
+  authors: { id: number; name: string; cpf: string; email: string }[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -47,5 +56,15 @@ export class CertificateService {
 
   public downloadCertificate(code: string): Observable<Blob> {
     return this.http.get(`${API_BASE_URL}/certificate/download/${code}`, { responseType: 'blob' });
+  }
+
+  public getGroupedCertificates(type: string, articleTitle?: string, page: number = 0, size: number = 10): Observable<Page<CertificateGroupResponse>> {
+    let params = new HttpParams().set('page', page.toString()).set('size', size.toString()).set('type', type);
+    if (articleTitle) params = params.set('articleTitle', articleTitle);
+    return this.http.get<Page<CertificateGroupResponse>>(API_BASE_URL + "/certificate/grouped", { params });
+  }
+
+  public deleteBatchCertificate(code: string): Observable<void> {
+    return this.http.delete<void>(`${API_BASE_URL}/certificate/batch/${code}`);
   }
 }

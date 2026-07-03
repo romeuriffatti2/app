@@ -18,8 +18,20 @@
             }
             @case ('cert-list') {
                 <div class="form-card form-card--wide">
-                    <h2 class="form-title">Certificados Emitidos</h2>
-                    <app-cert-list></app-cert-list>
+                    <h2 class="form-title">Certificados (Gerais)</h2>
+                    <app-cert-list listType="all"></app-cert-list>
+                </div>
+            }
+            @case ('cert-list-aceite') {
+                <div class="form-card form-card--wide">
+                    <h2 class="form-title">Declarações de Aceite</h2>
+                    <app-cert-list listType="aceite"></app-cert-list>
+                </div>
+            }
+            @case ('cert-list-publicacao') {
+                <div class="form-card form-card--wide">
+                    <h2 class="form-title">Certificados de Publicação</h2>
+                    <app-cert-list listType="publicacao"></app-cert-list>
                 </div>
             }
             @case ('mag-form') {
