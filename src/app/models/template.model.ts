@@ -2,6 +2,8 @@ export interface PdfmeTemplate {
   id: number;
   name: string;
   type: string;
+  emailSubject?: string;
+  emailBody?: string;
   systemDefault: boolean;
   sourceTemplateId: number | null;
   jsonSchema: string;
@@ -11,5 +13,7 @@ export interface PdfmeTemplate {
 
 export interface SaveTemplateRequest {
   name?: string;
+  emailSubject?: string;
+  emailBody?: string;
   jsonSchema?: string;
 }

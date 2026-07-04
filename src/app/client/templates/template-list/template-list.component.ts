@@ -1,5 +1,6 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { TemplateService } from '../../../services/template.service';
 import { PdfmeTemplate } from '../../../models/template.model';
@@ -7,7 +8,7 @@ import { PdfmeTemplate } from '../../../models/template.model';
 @Component({
   selector: 'app-template-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './template-list.component.html',
   styleUrl: './template-list.component.css'
 })
@@ -110,6 +111,49 @@ export class TemplateListComponent implements OnInit {
       custom: 'Personalizado'
     };
     return labels[type] ?? type;
+  }
+
+  // --- Modal de Edição de E-mail ---
+  emailModalOpen = signal(false);
+  currentEmailTemplate = signal<PdfmeTemplate | null>(null);
+  emailSubjectInput = signal('');
+  emailBodyInput = signal('');
+
+  openEmailEditor(template: PdfmeTemplate) {
+    this.currentEmailTemplate.set(template);
+    this.emailSubjectInput.set(template.emailSubject || '');
+    this.emailBodyInput.set(template.emailBody || '');
+    this.emailModalOpen.set(true);
+  }
+
+  closeEmailEditor() {
+    this.emailModalOpen.set(false);
+    this.currentEmailTemplate.set(null);
+  }
+
+  saveEmailTemplate() {
+    const magId = this.magazineId();
+    const template = this.currentEmailTemplate();
+    if (!magId || !template) return;
+
+    this.actionLoading.set(template.id);
+    this.templateService.save(magId, template.id, {
+      emailSubject: this.emailSubjectInput(),
+      emailBody: this.emailBodyInput()
+    }).subscribe({
+      next: (updated) => {
+        this.templates.update(list =>
+          list.map(t => t.id === updated.id ? updated : t)
+        );
+        this.closeEmailEditor();
+        this.actionLoading.set(null);
+      },
+      error: (err) => {
+        console.error(err);
+        this.actionLoading.set(null);
+        alert('Erro ao salvar template de e-mail.');
+      }
+    });
   }
 
 }
