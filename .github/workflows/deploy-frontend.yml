@@ -1,0 +1,58 @@
+name: Deploy Frontend to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout do repositório (root do repositório é app/app/)
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Configuração do Node.js para o Frontend
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # 3. Instalação de dependências e compilação do Frontend
+      - name: Build Frontend
+        run: |
+          npm ci
+          npm run build
+
+      # 4. Compactação do Frontend em ZIP (arquivos estáticos na raiz do ZIP)
+      - name: Zip Frontend Dist
+        run: |
+          cd dist/app/browser
+          zip -r ../../../frontend.zip .
+
+      # 5. Configuração do agente SSH com a chave privada
+      - name: Set up SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      # 6. Deploy (Transferência de arquivo ZIP e descompactação na VPS)
+      - name: Transfer and Unzip Frontend
+        run: |
+          # Adicionar a VPS ao known_hosts para evitar prompts interativos
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+          # Enviar o ZIP do Frontend via SCP
+          scp -P ${{ secrets.SSH_PORT }} frontend.zip ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/certificados/frontend.zip
+
+          # Executar comandos SSH para limpar arquivos antigos e descompactar o novo frontend
+          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            cd /opt/certificados &&
+            rm -rf frontend/* &&
+            unzip frontend.zip -d frontend/ &&
+            rm frontend.zip
+          "
